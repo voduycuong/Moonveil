@@ -1,7 +1,7 @@
 // -----------------------------------main.c -------------------------------------
 #include "mbox.h"
-#include "uart0.h"
-#include "uart1.h"
+#include "uart.h"
+
 void main()
 {
     // set up serial console
