@@ -1,16 +1,13 @@
 #--------------------------------------Makefile-------------------------------------
 
-# Directories
 # Source directory
 SRC_DIR := src
 # Object files
-BLD_DIR := obj
+BLD_DIR := object
 # Header directory
-INC_DIR := inc
+INC_DIR := include
 # Linker directory
-SCT_DIR := inc
-# UART directory
-UART_DIR := serial
+SCT_DIR := include
 
 # Source files
 CFILES := $(wildcard $(SRC_DIR)/*.c)
@@ -33,33 +30,13 @@ GCCFLAGS += -Duart
 
 LDFLAGS = -nostdlib
 
-rpi = 3
-# By default RPI3 is defined in gpio.h
-# This is just for clean output
-
-# Check for uart option
-ifeq ($(uart), 0)
-UART_TYPE = 0
-else 
-UART_TYPE = 1
-endif
-
-# Options for emulator
-OPT = 
-ifeq ($(UART_TYPE), 1)
-OPT = -serial null -serial stdio
-endif
-ifeq ($(UART_TYPE), 0)
 OPT = -serial stdio
-endif
 
 all: $(TARGET).img
 
-$(TARGET).img: $(BLD_DIR)/boot.o $(OFILES) $(BLD_DIR)/uart$(UART_TYPE).o
+$(TARGET).img: $(BLD_DIR)/boot.o $(OFILES)
 	@echo -------------------------------------
-	@echo -- Choosing setup: RPI$(rpi) and UART$(UART_TYPE)
-	@echo -------------------------------------
-	aarch64-none-elf-ld $(LDFLAGS) $(BLD_DIR)/boot.o $(OFILES) $(BLD_DIR)/uart$(UART_TYPE).o -T $(LFILES) -o $(BLD_DIR)/$(TARGET).elf
+	aarch64-none-elf-ld $(LDFLAGS) $(BLD_DIR)/boot.o $(OFILES) -T $(LFILES) -o $(BLD_DIR)/$(TARGET).elf
 	aarch64-none-elf-objcopy -O binary $(BLD_DIR)/$(TARGET).elf $(TARGET).img
 	@echo -------------------------------------
 
@@ -68,9 +45,6 @@ $(BLD_DIR)/boot.o: $(SRC_DIR)/boot.S | $(BLD_DIR)
 	$(CC) $(GCCFLAGS) -c $< -o $@
 
 $(BLD_DIR)/%.o: $(SRC_DIR)/%.c $(INC_DIR) | $(BLD_DIR)
-	$(CC) $(GCCFLAGS) -c $< -o $@ -I$(INC_DIR)
-
-$(BLD_DIR)/uart$(UART_TYPE).o: $(UART_DIR)/uart$(UART_TYPE).c $(INC_DIR) | $(BLD_DIR)
 	$(CC) $(GCCFLAGS) -c $< -o $@ -I$(INC_DIR)
 # ---------------------------------------------------------------------------------
 

@@ -163,3 +163,4 @@ void uart_dec(int num)
 	}
 	str[len] = '\0';
 	uart_puts(str);
+}

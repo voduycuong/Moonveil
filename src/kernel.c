@@ -1,45 +1,74 @@
-// -----------------------------------main.c -------------------------------------
-#include "mbox.h"
 #include "uart.h"
+#define MAX_CMD_SIZE 100
+
+void cli()
+{
+	static char cli_buffer[MAX_CMD_SIZE];
+	static int index = 0;
+
+	int flag = 1;
+
+	while (flag)
+	{
+		uart_puts("Moonveil > ");
+		flag = 0;
+	}
+
+	// read and send back each char
+	char c = uart_getc();
+	uart_sendc(c);
+
+	// put into a buffer until got new line character
+	if (c != '\n')
+	{
+		cli_buffer[index] = c; // Store into the buffer
+		index++;
+	}
+
+	else if (c == '\n')
+	{
+		cli_buffer[index] = '\0';
+
+		uart_puts("\nGot commands: ");
+		uart_puts(cli_buffer);
+		uart_puts("\n");
+
+		/* Compare with supported commands and execute
+		 * ........................................... */
+
+		// Return to command line
+		index = 0;
+
+		flag = 1;
+	}
+}
 
 void main()
 {
-    // set up serial console
-    uart_init();
-    // say hello
-    uart_puts("Hello World!\n");
-    // mailbox data buffer: Read ARM frequency
-    mBuf[0] = 8 * 4;        // Message Buffer Size in bytes (8 elements * 4 bytes (32 bit) each)
-    mBuf[1] = MBOX_REQUEST; // Message Request Code (this is a request message)
-    mBuf[2] = 0x00030002;   // TAG Identifier: Get clock rate
-    mBuf[3] = 8;            // Value buffer size in bytes (max of request and response lengths)
-    mBuf[4] = 0;            // REQUEST CODE = 0
-    mBuf[5] = 3;            // clock id: ARM system clock
-    mBuf[6] = 0;            // clear output buffer (response data are mBuf[5] & mBuf[6])
-    mBuf[7] = MBOX_TAG_LAST;
-    if (mbox_call(ADDR(mBuf), MBOX_CH_PROP))
-    {
-        uart_puts("Response Code for whole message: ");
-        uart_hex(mBuf[1]);
-        uart_puts("\n");
-        uart_puts("Response Code in Message TAG: ");
-        uart_hex(mBuf[4]);
-        uart_puts("\n");
-        uart_puts("DATA: ARM clock rate = ");
-        uart_dec(mBuf[6]);
-        uart_puts("\n");
-    }
-    else
-    {
-        uart_puts("Unable to query!\n");
-    }
-    // echo everything back
-    while (1)
-    {
-        // read each char
-        char c = uart_getc();
-        // send back twice
-        uart_sendc(c);
-        uart_sendc(c);
-    }
+	// Set up serial console
+	uart_init();
+
+	// // Welcome screen
+	// uart_puts("  												*** EEET2490 ***\n");
+	// uart_puts("     									  	  	CC: Mr. Linh Tran - TA: Mr. Phuc Nguyen\n");
+
+	// uart_puts("                           	     /\\\\\\\\            /\\\\\\\\                                                                             /\\\\\\\\\\\\            \n");
+	// uart_puts("                           	     \\/\\\\\\\\\\\\        /\\\\\\\\\\\\                                                                            \\////\\\\\\           \n");
+	// uart_puts("                           	      \\/\\\\\\//\\\\\\    /\\\\\\//\\\\\\                                                                       /\\\\\\    \\/\\\\\\          \n");
+	// uart_puts("                           	       \\/\\\\\\\\///\\\\\\/\\\\\\/ \\/\\\\\\     /\\\\\\\\\\        /\\\\\\\\\\     /\\\\/\\\\\\\\\\\\    /\\\\\\    /\\\\\\   /\\\\\\\\\\\\\\\\  \\///     \\/\\\\\\         \n");
+	// uart_puts("                           	        \\/\\\\\\  \\///\\\\\\/   \\/\\\\\\   /\\\\\\///\\\\\\    /\\\\\\///\\\\\\  \\/\\\\\\////\\\\\\  \\//\\\\\\  /\\\\\\  /\\\\\\/////\\\\\\  /\\\\\\    \\/\\\\\\        \n");
+	// uart_puts("                           	         \\/\\\\\\    \\///     \\/\\\\\\  /\\\\\\  \\//\\\\\\  /\\\\\\  \\//\\\\\\ \\/\\\\\\  \\//\\\\\\  \\//\\\\\\/\\\\\\  /\\\\\\\\\\\\\\\\\\\\\\  \\/\\\\\\    \\/\\\\\\       \n");
+	// uart_puts("                           	          \\/\\\\\\             \\/\\\\\\ \\//\\\\\\  /\\\\\\  \\//\\\\\\  /\\\\\\  \\/\\\\\\   \\/\\\\\\   \\//\\\\\\\\\\  \\//\\\\///////   \\/\\\\\\    \\/\\\\\\      \n");
+	// uart_puts("                           	           \\/\\\\\\             \\/\\\\\\  \\///\\\\\\\\\\/    \\///\\\\\\\\\\/   \\/\\\\\\   \\/\\\\\\    \\//\\\\\\    \\//\\\\\\\\\\\\\\\\\\\\ \\/\\\\\\  /\\\\\\\\\\\\\\\\\\  \n");
+	// uart_puts("                           	            \\///              \\///     \\/////        \\/////     \\///    \\///      \\///      \\//////////  \\///  \\/////////  \n");
+	// uart_puts("\n");
+	// uart_puts("     										Developed by Vo Duy Cuong - S3941544\n");
+
+	uart_puts("---> The welcome screen\n");
+
+	// Run CLI
+	while (1)
+	{
+		cli();
+	}
 }
