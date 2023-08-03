@@ -6,13 +6,7 @@ void cli()
 	static char cli_buffer[MAX_CMD_SIZE];
 	static int index = 0;
 
-	int flag = 1;
-
-	while (flag)
-	{
-		uart_puts("Moonveil > ");
-		flag = 0;
-	}
+	uart_puts("Moonveil> ");
 
 	// read and send back each char
 	char c = uart_getc();
@@ -37,9 +31,6 @@ void cli()
 		 * ........................................... */
 
 		// Return to command line
-		index = 0;
-
-		flag = 1;
 	}
 }
 
@@ -49,7 +40,8 @@ void main()
 	uart_init();
 
 	// // Welcome screen
-	// uart_puts("  												*** EEET2490 ***\n");
+	// uart_puts("  											*** RMIT University Vietnam ***\n");
+	// uart_puts("  								*** EEET2490 - Embedded Systems: Operating Systems & Interfacing ***\n");
 	// uart_puts("     									  	  	CC: Mr. Linh Tran - TA: Mr. Phuc Nguyen\n");
 
 	// uart_puts("                           	     /\\\\\\\\            /\\\\\\\\                                                                             /\\\\\\\\\\\\            \n");
