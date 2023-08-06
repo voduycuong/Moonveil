@@ -8,6 +8,9 @@ void main()
 
 	// show_welcome_screen();
 
+	// For testing
+	show_prompt();
+
 	// Run CLI
 	while (1)
 	{
@@ -58,6 +61,7 @@ void cli()
 				uart_puts("\033[1D"); // Move cursor left 1 step
 				uart_puts("\033[0K"); // Clear line from cursor left
 			}
+
 			else if (index < 0)
 			{
 				index = 0;
@@ -133,13 +137,15 @@ void show_help()
 	uart_puts("		-t <text color>\n");
 	uart_puts("		-b <background color>\n");
 	uart_puts("	showinfo			Show board revision and board MAC address\n");
+	uart_puts("	printf				Print out data\n");
+	uart_puts("	about				Show credit\n");
 }
 
 // clear command
 void clear_screen()
 {
 	// "Fake" clear screen
-	uart_puts("\033[2J\033[2H");
+	uart_puts("\033[2J\033[H"); // Clear entire screen + Move cursor to upper left corner
 }
 
 // setcolor command
@@ -179,7 +185,7 @@ void show_info()
 
 void show_about()
 {
-	uart_puts("  										  *** RMIT University Vietnam ***\n");
+	uart_puts("  								*** RMIT University Vietnam ***\n");
 	uart_puts("  								*** EEET2490 - Embedded Systems: Operating Systems & Interfacing ***\n");
 	uart_puts("     									  	  CC: Mr. Linh Tran - TA: Mr. Phuc Nguyen\n");
 
