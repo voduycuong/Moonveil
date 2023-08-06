@@ -1,10 +1,10 @@
-# Moonveil - Developed by Vo Duy Cuong - S3941544
+# Moonveil
 ## RMIT University Vietnam
 ### EEET2490 - Embedded Systems: Operating Systems & Interfacing
 ### CC: Mr. Linh Tran - TA: Mr. Phuc Nguyen
 #### This is part of Assessment 2 - Individual Assignment
 
-### Bare OS
+### Developed by Vo Duy Cuong - S3941544
 <p>Main function:</p>
 <ol>
     <li>Auto-completion</li>
