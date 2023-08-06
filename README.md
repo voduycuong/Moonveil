@@ -3,9 +3,8 @@
 ### EEET2490 - Embedded Systems: Operating Systems & Interfacing
 ### CC: Mr. Linh Tran - TA: Mr. Phuc Nguyen
 #### This is part of Assessment 2 - Individual Assignment
-<br>
-<p> Bare OS </p>
-<br>
+
+### Bare OS
 <p>Main function:</p>
 <ol>
     <li>Auto-completion</li>
