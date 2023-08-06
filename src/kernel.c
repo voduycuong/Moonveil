@@ -91,22 +91,30 @@ void cli()
 			command_index++;
 
 			// Check buffer with available commands
-			if (strcmp(cli_buffer, "help"))
+			if (strcmp(cli_buffer, commands[0])) // help
 				show_help();
 
-			else if (strcmp(cli_buffer, "setcolor"))
-				set_color();
-
-			else if (strcmp(cli_buffer, "showinfo"))
-				show_info();
-
-			else if (strcmp(cli_buffer, "clear"))
+			else if (strcmp(cli_buffer, commands[1])) // clear
 				clear_screen();
 
-			else if (strcmp(cli_buffer, "about"))
+			else if (strcmp(cli_buffer, commands[2])) // setcolor
+				set_color();
+
+			else if (strcmp(cli_buffer, commands[3])) // showinfo
+				show_info();
+
+			else if (strcmp(cli_buffer, commands[4])) // printf
+				printf();
+
+			else if (strcmp(cli_buffer, commands[5])) // about
 				show_about();
 
-			// Show errors if command not found
+			else if (strcmp(cli_buffer, commands[6])) // about
+			{
+				uart_puts(subst("help ---help---", 4));
+			}
+
+			// Errors if command not found
 			else
 			{
 				uart_puts("\n");
@@ -132,7 +140,7 @@ void show_help()
 	uart_puts("	help				Show brief information of all commands\n");
 	uart_puts("	help <command_name>		Show full information of all commands\n");
 	uart_puts("	clear				Clear screen\n");
-	uart_puts("	set color			Set text/background color of the console\n"); //  color, and/or background
+	uart_puts("	setcolor			Set text/background color of the console\n"); //  color, and/or background
 	//  to one of the following colors: BLACK, RED, GREEN, YELLOW, BLUE, PURPLE, CYAN, WHITE
 	uart_puts("		-t <text color>\n");
 	uart_puts("		-b <background color>\n");
@@ -220,7 +228,16 @@ int strcmp(char *a, char *b)
 		return 0;
 }
 
+// Function for extracting option of a command
+char *subst(char *string, int pos)
+{
+	char *result;
+	result = &string[pos];
+	return result;
+}
+
 void show_prompt()
 {
-	uart_puts("Moonveil> ");
+	uart_puts("\x1b[32mMoonveil> ");
+	uart_puts("\x1b[37m");
 }
