@@ -7,7 +7,7 @@ BLD_DIR := object
 # Header directory
 INC_DIR := include
 # Linker directory
-SCT_DIR := include
+SCT_DIR := linker
 
 # Source files
 CFILES := $(wildcard $(SRC_DIR)/*.c)
@@ -16,7 +16,7 @@ OFILES := $(CFILES:$(SRC_DIR)/%.c=$(BLD_DIR)/%.o)
 # Header files
 HFILES := $(wildcard $(INC_DIR)/*.h)
 # Linker files
-LFILES := $(wildcard $(INC_DIR)/*.ld)
+LFILES := $(wildcard $(SCT_DIR)/*.ld)
 # Target file
 TARGET := kernel8
 

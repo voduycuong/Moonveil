@@ -1,15 +1,16 @@
 #include "kernel.h"
 #include "mbox.h"
+#include "uart.h"
+// #include "printf.h"
+#include "command_info.h"
+#include "string.h"
 
 void main()
 {
 	// Set up serial console
 	uart_init();
 
-	// show_welcome_screen();
-
-	// For testing
-	show_prompt();
+	show_welcome_screen();
 
 	// Run CLI
 	while (1)
@@ -39,12 +40,15 @@ void cli()
 	static int index = 0;
 	static int command_index = 0;
 
+	static char option_flag = 'x';
+
 	// Read and send back each char
 	char c = uart_getc();
 
 	// Put into a buffer until got new line character
 	if (c != '\n')
 	{
+		// Check for backspace, if not, continue bufferring
 		if (c != '\b')
 		{
 			uart_sendc(c);
@@ -52,16 +56,21 @@ void cli()
 			index++;
 		}
 
+		// If backspaced, clear in buffer + clear on terminal
 		else if (c == '\b')
 		{
 			index--;
 			if (index >= 0)
 			{
+				// Clear 1 char in buffer
 				cli_buffer[index] = '\0';
+
+				// Clear in terminal
 				uart_puts("\033[1D"); // Move cursor left 1 step
 				uart_puts("\033[0K"); // Clear line from cursor left
 			}
 
+			// Restart index if buffer is empty
 			else if (index < 0)
 			{
 				index = 0;
@@ -69,9 +78,12 @@ void cli()
 		}
 	}
 
+	// Auto complete
+
+	// User input 'return'
 	else if (c == '\n')
 	{
-		// Check if no input
+		// Check if none command
 		if (cli_buffer[0] == '\0')
 		{
 			// Return to command line
@@ -81,6 +93,7 @@ void cli()
 		}
 		else
 		{
+			// Command is complete
 			cli_buffer[index] = '\0';
 
 			// Save current buffer
@@ -89,6 +102,13 @@ void cli()
 				command_history[command_index][i] = cli_buffer[i];
 			}
 			command_index++;
+
+			if (option_flag == 'h')
+			{
+				uart_puts(option_flag);
+			}
+
+			// show_advanced_help(subst(cli_buffer, 5));
 
 			// Check buffer with available commands
 			if (strcmp(cli_buffer, commands[0])) // help
@@ -103,16 +123,17 @@ void cli()
 			else if (strcmp(cli_buffer, commands[3])) // showinfo
 				show_info();
 
-			else if (strcmp(cli_buffer, commands[4])) // printf
-				printf();
+			// else if (strcmp(cli_buffer, commands[4])) // printf
+			// 	printf();
 
 			else if (strcmp(cli_buffer, commands[5])) // about
 				show_about();
 
-			else if (strcmp(cli_buffer, commands[6])) // about
-			{
-				uart_puts(subst("help ---help---", 4));
-			}
+			// else if (strcmp(cli_buffer, commands[6])) // <--------------------------- For testing
+			// {
+			// 	uart_puts("\n");
+			// 	uart_puts(strcmp(subst(cli_buffer, 5), commands[0]));
+			// }
 
 			// Errors if command not found
 			else
@@ -126,7 +147,7 @@ void cli()
 			uart_puts("\n");
 			show_prompt();
 
-			// Clear the buffer
+			// Emply the buffer
 			cli_buffer[0] = '\0';
 			index = 0;
 		}
@@ -137,23 +158,45 @@ void cli()
 void show_help()
 {
 	uart_puts("\n");
-	uart_puts("	help				Show brief information of all commands\n");
-	uart_puts("	help <command_name>		Show full information of all commands\n");
-	uart_puts("	clear				Clear screen\n");
-	uart_puts("	setcolor			Set text/background color of the console\n"); //  color, and/or background
-	//  to one of the following colors: BLACK, RED, GREEN, YELLOW, BLUE, PURPLE, CYAN, WHITE
-	uart_puts("		-t <text color>\n");
-	uart_puts("		-b <background color>\n");
-	uart_puts("	showinfo			Show board revision and board MAC address\n");
-	uart_puts("	printf				Print out data\n");
-	uart_puts("	about				Show credit\n");
+	uart_puts("	help\t\t\t\tShow brief information of all commands\n");
+	uart_puts("	help <command_name>\t\tShow full information of all commands\n");
+	uart_puts("	clear\t\t\t\tClear screen\n");
+	uart_puts("	setcolor\t\t\tSet text/background color of the console\n");
+	uart_puts("	showinfo\t\t\tShow board revision and board MAC address\n");
+	uart_puts("	printf\t\t\t\tPrint out data\n");
+	uart_puts("	about\t\t\t\tShow credit\n");
+}
+
+// "advanced" help command
+void show_advanced_help(char *help_option)
+{
+	if (strcmp(help_option, commands[0])) // help command in detail
+		show_help_info();
+
+	else if (strcmp(help_option, commands[1])) // clear command in detail
+		clear_screen_info();
+
+	else if (strcmp(help_option, commands[2])) // setcolor command in detail
+		set_color_info();
+
+	else if (strcmp(help_option, commands[3])) // showinfo command in detail
+		show_info_info();
+
+	else if (strcmp(help_option, commands[4])) // printf command in detail
+		printf_info();
+
+	else if (strcmp(help_option, commands[5])) // about command in detail
+		about_info();
+
+	else if (strcmp(help_option, commands[6])) // test command in detail
+		test_info();
 }
 
 // clear command
 void clear_screen()
 {
 	// "Fake" clear screen
-	uart_puts("\033[2J\033[H"); // Clear entire screen + Move cursor to upper left corner
+	uart_puts("\033[2J\033[f"); // Clear entire screen + Move cursor to upper left corner
 }
 
 // setcolor command
@@ -193,9 +236,9 @@ void show_info()
 
 void show_about()
 {
-	uart_puts("  								*** RMIT University Vietnam ***\n");
-	uart_puts("  								*** EEET2490 - Embedded Systems: Operating Systems & Interfacing ***\n");
-	uart_puts("     									  	  CC: Mr. Linh Tran - TA: Mr. Phuc Nguyen\n");
+	uart_puts("\t\t\t\t\t\t\t\t\t*** RMIT University Vietnam ***\n");
+	uart_puts("\t\t\t\t\t\t\t\t*** EEET2490 - Embedded Systems: Operating Systems & Interfacing ***\n");
+	uart_puts("\t\t\t\t\t\t\t\t\t\tCC: Mr. Linh Tran - TA: Mr. Phuc Nguyen\n");
 
 	uart_puts("                           	     /\\\\\\\\            /\\\\\\\\                                                                             /\\\\\\\\\\\\            \n");
 	uart_puts("                           	     \\/\\\\\\\\\\\\        /\\\\\\\\\\\\                                                                            \\////\\\\\\           \n");
@@ -208,36 +251,12 @@ void show_about()
 	uart_puts("                           	            \\///              \\///     \\/////        \\/////     \\///    \\///      \\///      \\//////////  \\///  \\/////////  \n");
 	uart_puts("\n");
 
-	uart_puts("     										Developed by Vo Duy Cuong - S3941544\n");
+	uart_puts("\t\t\t\t\t\t\t\t\t\tDeveloped by Vo Duy Cuong - S3941544\n");
 }
 
-// Function for comparing 2 strings
-int strcmp(char *a, char *b)
-{
-	int i = 0, c = 0;
-	while ((a[i] != '\0') || (b[i] != '\0'))
-	{
-		if (a[i] != b[i])
-			c++;
-		i++;
-	}
-
-	if (c == 0)
-		return 1;
-	else
-		return 0;
-}
-
-// Function for extracting option of a command
-char *subst(char *string, int pos)
-{
-	char *result;
-	result = &string[pos];
-	return result;
-}
-
+// Function for showing prompt at the beginning of each command
 void show_prompt()
 {
-	uart_puts("\x1b[32mMoonveil> ");
-	uart_puts("\x1b[37m");
+	uart_puts("\x1b[1;34mMoonveil> "); // Bold & Blue foreground text
+	uart_puts("\x1b[0m");			   // Set as default
 }
