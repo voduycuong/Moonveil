@@ -1,3 +1,6 @@
+#ifndef _UART_H
+#define _UART_H
+
 #include "gpio.h"
 
 /* PL011 UART (UART0) registers */
@@ -155,3 +158,5 @@ char uart_getc();
 void uart_puts(char *s);
 void uart_hex(unsigned int d);
 void uart_dec(int num);
+
+#endif
