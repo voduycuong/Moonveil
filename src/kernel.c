@@ -5,31 +5,26 @@
 #include "command_info.h"
 #include "string.h"
 
+#define DEBUG_MODE = 1
+#ifdef DEBUG_MODE
+debugging = 1;
+#endif
+
 void main()
 {
 	// Set up serial console
 	uart_init();
 
-	show_welcome_screen();
+	if (debugging)
+		show_prompt();
+	else
+		show_welcome_screen();
 
 	// Run CLI
 	while (1)
 	{
 		cli();
 	}
-}
-
-void show_welcome_screen()
-{
-	clear_screen();
-
-	// Welcome screen
-	show_about();
-
-	uart_puts("\n");
-	uart_puts("Type 'help' to show list of available commands\n");
-	uart_puts("\n");
-	show_prompt();
 }
 
 void cli()
@@ -40,7 +35,8 @@ void cli()
 	static int index = 0;
 	static int command_index = 0;
 
-	static char option_flag = 'x';
+	static char option_flag;
+	static char temp[10];
 
 	// Read and send back each char
 	char c = uart_getc();
@@ -83,6 +79,24 @@ void cli()
 	// User input 'return'
 	else if (c == '\n')
 	{
+		for (int i = 0; i < 5; i++)
+			temp[i] = cli_buffer[i];
+
+		if (temp[4] == ' ')
+		{
+			temp[4] = '\0';
+			uart_puts(temp);
+			uart_puts("\n");
+			if (strcmp(temp, commands[0]))
+				option_flag = 'h';
+			else
+				option_flag = 'x';
+		}
+
+		uart_puts("Option flag is ");
+		uart_puts(option_flag);
+		uart_puts("\n");
+
 		// Check if none command
 		if (cli_buffer[0] == '\0')
 		{
@@ -91,6 +105,7 @@ void cli()
 			show_prompt();
 			index = 0;
 		}
+
 		else
 		{
 			// Command is complete
@@ -135,12 +150,10 @@ void cli()
 			// 	uart_puts(strcmp(subst(cli_buffer, 5), commands[0]));
 			// }
 
-			// Errors if command not found
+			// Show error if command not found
 			else
 			{
-				uart_puts("\n");
-				uart_puts(cli_buffer);
-				uart_puts(": command not found\n");
+				show_error(cli_buffer);
 			}
 
 			// Return to command line
@@ -254,9 +267,32 @@ void show_about()
 	uart_puts("\t\t\t\t\t\t\t\t\t\tDeveloped by Vo Duy Cuong - S3941544\n");
 }
 
+// Function for showing a welcome screen when OS boot up
+void show_welcome_screen()
+{
+	clear_screen();
+
+	// Welcome screen
+	show_about();
+
+	uart_puts("\n");
+	uart_puts("Type 'help' to show list of available commands\n");
+	uart_puts("\n");
+	show_prompt();
+}
+
 // Function for showing prompt at the beginning of each command
 void show_prompt()
 {
 	uart_puts("\x1b[1;34mMoonveil> "); // Bold & Blue foreground text
 	uart_puts("\x1b[0m");			   // Set as default
+}
+
+// Function for output an error message
+void show_error(char *errorMessage)
+{
+	uart_puts("\n");
+	uart_puts("Error: '");
+	uart_puts(errorMessage);
+	uart_puts("' command is not found. See 'help'.\n");
 }

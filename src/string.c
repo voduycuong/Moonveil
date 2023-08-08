@@ -1,6 +1,9 @@
 #include "string.h"
 
-// Function for comparing 2 strings
+/* Function for comparing 2 strings
+ * return 1 if 2 strings is equal
+ * return 0 if 2 strings is NOT equal
+ */
 int strcmp(char *a, char *b)
 {
     int i = 0, c = 0;

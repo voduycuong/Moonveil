@@ -9,6 +9,7 @@ char *color[] = {"black", "red", "green", "yellow", "blue", "purple", "cyan", "w
 void cli();
 void show_welcome_screen();
 void show_prompt();
+void show_error(char *errorMessage);
 
 // Commands
 void show_help();
