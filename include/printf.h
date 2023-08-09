@@ -6,5 +6,6 @@
 #include "./gcclib/stdarg.h"
 
 void printf(char *string, ...);
+void printf_info();
 
 #endif

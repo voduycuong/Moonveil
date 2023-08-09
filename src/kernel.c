@@ -1,24 +1,11 @@
 #include "kernel.h"
-#include "mbox.h"
-#include "uart.h"
-// #include "printf.h"
-#include "command_info.h"
-#include "string.h"
-
-#define DEBUG_MODE = 1
-#ifdef DEBUG_MODE
-debugging = 1;
-#endif
 
 void main()
 {
 	// Set up serial console
 	uart_init();
 
-	if (debugging)
-		show_prompt();
-	else
-		show_welcome_screen();
+	show_welcome_screen();
 
 	// Run CLI
 	while (1)
@@ -30,13 +17,12 @@ void main()
 void cli()
 {
 	static char cli_buffer[MAX_CMD_SIZE];
-	static char command_history[50][MAX_CMD_SIZE]; // Max history is 50 commands
+	static char command_history[20][MAX_CMD_SIZE]; // Max history is 50 commands
 
 	static int index = 0;
 	static int command_index = 0;
 
-	static char option_flag;
-	static char temp[10];
+	static char cmd_flag = 'x';
 
 	// Read and send back each char
 	char c = uart_getc();
@@ -79,23 +65,6 @@ void cli()
 	// User input 'return'
 	else if (c == '\n')
 	{
-		for (int i = 0; i < 5; i++)
-			temp[i] = cli_buffer[i];
-
-		if (temp[4] == ' ')
-		{
-			temp[4] = '\0';
-			uart_puts(temp);
-			uart_puts("\n");
-			if (strcmp(temp, commands[0]))
-				option_flag = 'h';
-			else
-				option_flag = 'x';
-		}
-
-		uart_puts("Option flag is ");
-		uart_puts(option_flag);
-		uart_puts("\n");
 
 		// Check if none command
 		if (cli_buffer[0] == '\0')
@@ -113,48 +82,51 @@ void cli()
 
 			// Save current buffer
 			for (int i = 0; cli_buffer[i] != '\0'; i++)
-			{
 				command_history[command_index][i] = cli_buffer[i];
-			}
 			command_index++;
 
-			if (option_flag == 'h')
-			{
-				uart_puts(option_flag);
-			}
+			// Check whether 'help' goes with parameter or not
+			static char temp[10];
+			for (int i = 0; i < 5; i++) // Save the current buffer
+				temp[i] = cli_buffer[i];
 
-			// show_advanced_help(subst(cli_buffer, 5));
+			if (temp[4] == ' ') // Check for space which means receive another parameter
+			{
+				temp[4] = '\0'; // Enclose the string
+				if (strcmp(temp, "help"))
+					cmd_flag = 'h'; // Turn on 'help' with parameter flag
+			}
+			// Clear temp
+			temp[0] = '\0';
 
 			// Check buffer with available commands
-			if (strcmp(cli_buffer, commands[0])) // help
-				show_help();
+			if (strcmp(cli_buffer, "help") || cmd_flag == 'h') // help
+			{
+				show_help(cli_buffer, cmd_flag);
+				cmd_flag = 'x';
+			}
 
-			else if (strcmp(cli_buffer, commands[1])) // clear
+			else if (strcmp(cli_buffer, "clear")) // clear
 				clear_screen();
 
-			else if (strcmp(cli_buffer, commands[2])) // setcolor
-				set_color();
+			else if (strcmp(cli_buffer, "setcolor")) // setcolor
+			{
+				show_error(cli_buffer, "must go with parameter(s). See 'help setcolor'.");
+				set_color(cli_buffer, cmd_flag);
+			}
 
-			else if (strcmp(cli_buffer, commands[3])) // showinfo
+			else if (strcmp(cli_buffer, "showinfo")) // showinfo
 				show_info();
 
-			// else if (strcmp(cli_buffer, commands[4])) // printf
+			// else if (strcmp(cli_buffer, "printf")) // printf
 			// 	printf();
 
-			else if (strcmp(cli_buffer, commands[5])) // about
+			else if (strcmp(cli_buffer, "about")) // about
 				show_about();
-
-			// else if (strcmp(cli_buffer, commands[6])) // <--------------------------- For testing
-			// {
-			// 	uart_puts("\n");
-			// 	uart_puts(strcmp(subst(cli_buffer, 5), commands[0]));
-			// }
 
 			// Show error if command not found
 			else
-			{
-				show_error(cli_buffer);
-			}
+				show_error(cli_buffer, "is not found. See 'help' to see available commands.");
 
 			// Return to command line
 			uart_puts("\n");
@@ -167,116 +139,12 @@ void cli()
 	}
 }
 
-// help command
-void show_help()
-{
-	uart_puts("\n");
-	uart_puts("	help\t\t\t\tShow brief information of all commands\n");
-	uart_puts("	help <command_name>\t\tShow full information of all commands\n");
-	uart_puts("	clear\t\t\t\tClear screen\n");
-	uart_puts("	setcolor\t\t\tSet text/background color of the console\n");
-	uart_puts("	showinfo\t\t\tShow board revision and board MAC address\n");
-	uart_puts("	printf\t\t\t\tPrint out data\n");
-	uart_puts("	about\t\t\t\tShow credit\n");
-}
-
-// "advanced" help command
-void show_advanced_help(char *help_option)
-{
-	if (strcmp(help_option, commands[0])) // help command in detail
-		show_help_info();
-
-	else if (strcmp(help_option, commands[1])) // clear command in detail
-		clear_screen_info();
-
-	else if (strcmp(help_option, commands[2])) // setcolor command in detail
-		set_color_info();
-
-	else if (strcmp(help_option, commands[3])) // showinfo command in detail
-		show_info_info();
-
-	else if (strcmp(help_option, commands[4])) // printf command in detail
-		printf_info();
-
-	else if (strcmp(help_option, commands[5])) // about command in detail
-		about_info();
-
-	else if (strcmp(help_option, commands[6])) // test command in detail
-		test_info();
-}
-
-// clear command
-void clear_screen()
-{
-	// "Fake" clear screen
-	uart_puts("\033[2J\033[f"); // Clear entire screen + Move cursor to upper left corner
-}
-
-// setcolor command
-void set_color()
-{
-	uart_puts("\x1b[32mtesting\n");
-}
-
-// showinfo command
-void show_info()
-{
-	mBuf[0] = 8 * 4;		// Message Buffer Size in bytes (8 elements * 4 bytes (32 bit) each)
-	mBuf[1] = MBOX_REQUEST; // Message Request Code (this is a request message)
-	mBuf[2] = 0x00010002;	// TAG Identifier: Get board revision
-	mBuf[3] = 8;			// Value buffer size in bytes (max of request and response lengths)
-	mBuf[4] = 0;			// REQUEST CODE = 0
-	mBuf[5] = 3;			// clock id: ARM system clock
-	mBuf[6] = 0;			// clear output buffer (response data are mBuf[5] & mBuf[6])
-	mBuf[7] = MBOX_TAG_LAST;
-	if (mbox_call(ADDR(mBuf), MBOX_CH_PROP))
-	{
-		uart_puts("Response Code for whole message: ");
-		uart_hex(mBuf[1]);
-		uart_puts("\n");
-		uart_puts("Response Code in Message TAG: ");
-		uart_hex(mBuf[4]);
-		uart_puts("\n");
-		uart_puts("DATA: ARM clock rate = ");
-		uart_dec(mBuf[6]);
-		uart_puts("\n");
-	}
-	else
-	{
-		uart_puts("Unable to query!\n");
-	}
-}
-
-void show_about()
-{
-	uart_puts("\t\t\t\t\t\t\t\t\t*** RMIT University Vietnam ***\n");
-	uart_puts("\t\t\t\t\t\t\t\t*** EEET2490 - Embedded Systems: Operating Systems & Interfacing ***\n");
-	uart_puts("\t\t\t\t\t\t\t\t\t\tCC: Mr. Linh Tran - TA: Mr. Phuc Nguyen\n");
-
-	uart_puts("                           	     /\\\\\\\\            /\\\\\\\\                                                                             /\\\\\\\\\\\\            \n");
-	uart_puts("                           	     \\/\\\\\\\\\\\\        /\\\\\\\\\\\\                                                                            \\////\\\\\\           \n");
-	uart_puts("                           	      \\/\\\\\\//\\\\\\    /\\\\\\//\\\\\\                                                                       /\\\\\\    \\/\\\\\\          \n");
-	uart_puts("                           	       \\/\\\\\\\\///\\\\\\/\\\\\\/ \\/\\\\\\     /\\\\\\\\\\        /\\\\\\\\\\     /\\\\/\\\\\\\\\\\\    /\\\\\\    /\\\\\\   /\\\\\\\\\\\\\\\\  \\///     \\/\\\\\\         \n");
-	uart_puts("                           	        \\/\\\\\\  \\///\\\\\\/   \\/\\\\\\   /\\\\\\///\\\\\\    /\\\\\\///\\\\\\  \\/\\\\\\////\\\\\\  \\//\\\\\\  /\\\\\\  /\\\\\\/////\\\\\\  /\\\\\\    \\/\\\\\\        \n");
-	uart_puts("                           	         \\/\\\\\\    \\///     \\/\\\\\\  /\\\\\\  \\//\\\\\\  /\\\\\\  \\//\\\\\\ \\/\\\\\\  \\//\\\\\\  \\//\\\\\\/\\\\\\  /\\\\\\\\\\\\\\\\\\\\\\  \\/\\\\\\    \\/\\\\\\       \n");
-	uart_puts("                           	          \\/\\\\\\             \\/\\\\\\ \\//\\\\\\  /\\\\\\  \\//\\\\\\  /\\\\\\  \\/\\\\\\   \\/\\\\\\   \\//\\\\\\\\\\  \\//\\\\///////   \\/\\\\\\    \\/\\\\\\      \n");
-	uart_puts("                           	           \\/\\\\\\             \\/\\\\\\  \\///\\\\\\\\\\/    \\///\\\\\\\\\\/   \\/\\\\\\   \\/\\\\\\    \\//\\\\\\    \\//\\\\\\\\\\\\\\\\\\\\ \\/\\\\\\  /\\\\\\\\\\\\\\\\\\  \n");
-	uart_puts("                           	            \\///              \\///     \\/////        \\/////     \\///    \\///      \\///      \\//////////  \\///  \\/////////  \n");
-	uart_puts("\n");
-
-	uart_puts("\t\t\t\t\t\t\t\t\t\tDeveloped by Vo Duy Cuong - S3941544\n");
-}
-
 // Function for showing a welcome screen when OS boot up
 void show_welcome_screen()
 {
 	clear_screen();
-
-	// Welcome screen
-	show_about();
-
-	uart_puts("\n");
-	uart_puts("Type 'help' to show list of available commands\n");
+	show_about(); // Welcome screen
+	uart_puts("\nType 'help' to show list of available commands\n");
 	uart_puts("\n");
 	show_prompt();
 }
@@ -289,10 +157,11 @@ void show_prompt()
 }
 
 // Function for output an error message
-void show_error(char *errorMessage)
+void show_error(char *cmd, char *error_message)
 {
+	uart_puts("\nError: '");
+	uart_puts(cmd);
+	uart_puts("' ");
+	uart_puts(error_message);
 	uart_puts("\n");
-	uart_puts("Error: '");
-	uart_puts(errorMessage);
-	uart_puts("' command is not found. See 'help'.\n");
 }

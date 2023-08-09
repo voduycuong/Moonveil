@@ -3,7 +3,9 @@
         "stdarg.h": "c",
         "uart.h": "c",
         "kernel.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "showinfo.h": "c",
+        "help.h": "c"
     },
     "cmake.configureOnOpen": false
 }

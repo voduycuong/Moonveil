@@ -1,22 +1,21 @@
 #ifndef _KERNEL_H
 #define _KERNEL_H
 
-#define MAX_CMD_SIZE 100
+#include "mbox.h"
+#include "uart.h"
+#include "string.h"
+#include "help.h"
+#include "clear.h"
+#include "setcolor.h"
+#include "showinfo.h"
+#include "about.h"
+#include "printf.h"
 
-char *commands[] = {"help", "clear", "setcolor", "showinfo", "printf", "about", "test"};
-char *color[] = {"black", "red", "green", "yellow", "blue", "purple", "cyan", "white"};
+#define MAX_CMD_SIZE 100
 
 void cli();
 void show_welcome_screen();
 void show_prompt();
-void show_error(char *errorMessage);
-
-// Commands
-void show_help();
-void show_advanced_help(char *help_option);
-void clear_screen();
-void set_color();
-void show_info();
-void show_about();
+void show_error(char *cmd, char *error_message);
 
 #endif

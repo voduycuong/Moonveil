@@ -20,7 +20,9 @@ int strcmp(char *a, char *b)
         return 0;
 }
 
-// Function for extracting option of a command
+/* Function for extracting option of a command
+ * return a substring from 'pos' position of original string
+ */
 char *subst(char *string, int pos)
 {
     char *result;

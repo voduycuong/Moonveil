@@ -64,3 +64,10 @@ void printf(char *string, ...)
 	// Print out formated string
 	uart_puts(buffer);
 }
+
+// printf command info
+void printf_info()
+{
+	uart_puts("\n");
+	uart_puts("UNDER CONSTRUCTION\n");
+}
