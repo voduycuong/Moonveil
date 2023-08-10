@@ -29,3 +29,12 @@ char *subst(char *string, int pos)
     result = &string[pos];
     return result;
 }
+
+// Function for counting string length
+int strlen(char *string)
+{
+    int length = 0;
+    while (string[length] != '\0')
+        length++;
+    return length;
+}

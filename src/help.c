@@ -31,13 +31,15 @@ void show_help(char *buffer, char flag)
     else if (flag == 'x')
     {
         uart_puts("\n");
-        uart_puts("	help\t\t\t\tShow brief information of all commands\n");
-        uart_puts("	help <command_name>\t\tShow full information of all commands\n");
-        uart_puts("	clear\t\t\t\tClear screen\n");
-        uart_puts("	setcolor\t\t\tSet text/background color of the console\n");
-        uart_puts("	showinfo\t\t\tShow board revision and board MAC address\n");
-        uart_puts("	printf\t\t\t\tPrint out data\n");
-        uart_puts("	about\t\t\t\tShow credit\n");
+        uart_puts("\thelp\t\t\t\tShow brief information of all commands\n");
+        uart_puts("\thelp <command_name>\t\tShow full information of all commands\n");
+        uart_puts("\tclear\t\t\t\tClear screen\n");
+        uart_puts("\tsetcolor\t\t\tSet text/background color of the console\n");
+        uart_puts("\tshowinfo\t\t\tShow board revision and board MAC address\n");
+        uart_puts("\tprintf\t\t\t\tPrint out data\n");
+        uart_puts("\tabout\t\t\t\tShow credit\n");
+        uart_puts("\n");
+        uart_puts("\tHint: Use '_' and '+' to scroll down command history list.\n");
     }
 }
 

@@ -5,7 +5,9 @@
         "kernel.h": "c",
         "string.h": "c",
         "showinfo.h": "c",
-        "help.h": "c"
+        "help.h": "c",
+        "setcolor.h": "c",
+        "about.h": "c"
     },
     "cmake.configureOnOpen": false
 }

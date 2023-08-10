@@ -5,6 +5,7 @@ void main()
 	// Set up serial console
 	uart_init();
 
+	clear_screen();
 	show_welcome_screen();
 
 	// Run CLI
@@ -17,19 +18,93 @@ void main()
 void cli()
 {
 	static char cli_buffer[MAX_CMD_SIZE];
-	static char command_history[20][MAX_CMD_SIZE]; // Max history is 50 commands
+	static char command_history[20][MAX_CMD_SIZE]; // Max history is 20 commands
 
 	static int index = 0;
 	static int command_index = 0;
+	static int cmd_history_length = 0;
 
 	static char cmd_flag = 'x';
+	// static int overwrite_flag = 0;
+
+	static int underline_count = 0;
+	// static int plus_count = 0;
+
+	// Reset command index if exceeded
+	if (command_index > 20)
+	{
+		// overwrite_flag = 1;
+		command_index = 0;
+	}
 
 	// Read and send back each char
 	char c = uart_getc();
 
-	// Put into a buffer until got new line character
-	if (c != '\n')
+	while (command_history[cmd_history_length][0] != '\0')
+		cmd_history_length++;
+
+	if (c == '_')
 	{
+		if (underline_count < cmd_history_length)
+		{
+			underline_count++;
+
+			// uart_puts("\nUNDERLINE COUNT = ");
+			// uart_dec(underline_count);
+			// uart_puts("\n");
+
+			cli_buffer[0] = '\0';
+
+			if (command_index > 0)
+			{
+
+				// uart_puts("\nUNDERLINE COUNT = ");
+				// uart_dec(underline_count);
+				// uart_puts("\n");
+
+				command_index--; // Go back to previous command
+
+				// uart_puts("COMMAND INDEX = ");
+				// uart_dec(command_index);
+				// uart_puts("\n");
+
+				// uart_puts("COMMAND HISTORY LENGTH = ");
+				// uart_dec(cmd_history_length);
+				// uart_puts("\n");
+
+				// Load command from history into current buffer
+				for (int i = 0; i < strlen(command_history[command_index]); i++)
+				{
+					cli_buffer[i] = command_history[command_index][i];
+					cli_buffer[i + 1] = '\0';
+				}
+
+				// Check if user continue to scroll history ('_' is pressed more than once)
+				if (underline_count > 0)
+				{
+					int i;
+					for (i = 0; i < strlen(command_history[command_index + 1]); i++)
+						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+				}
+				uart_puts("\033[0K");  // Clear line from cursor right
+				uart_puts(cli_buffer); // Show buffer
+			}
+		}
+
+		// uart_puts("\nBUFFER LENGTH = ");
+		// uart_dec(strlen(cli_buffer));
+		// uart_puts(" ");
+
+		// uart_puts("\nBUFFER: ");
+		// uart_puts("'");
+		// uart_puts(cli_buffer);
+		// uart_puts("' ");
+	}
+
+	// Put into a buffer until got new line character
+	else if (c != '\n')
+	{
+
 		// Check for backspace, if not, continue bufferring
 		if (c != '\b')
 		{
@@ -48,23 +123,22 @@ void cli()
 				cli_buffer[index] = '\0';
 
 				// Clear in terminal
-				uart_puts("\033[1D"); // Move cursor left 1 step
-				uart_puts("\033[0K"); // Clear line from cursor left
+				uart_puts("\033[1D\033[0K"); // Move cursor left 1 step & Clear line from cursor left
 			}
 
 			// Restart index if buffer is empty
 			else if (index < 0)
-			{
 				index = 0;
-			}
 		}
 	}
-
-	// Auto complete
 
 	// User input 'return'
 	else if (c == '\n')
 	{
+		// uart_puts("\nBUFFER after RETURN is pressed: ");
+		// uart_puts("'");
+		// uart_puts(cli_buffer);
+		// uart_puts("'\n");
 
 		// Check if none command
 		if (cli_buffer[0] == '\0')
@@ -77,27 +151,33 @@ void cli()
 
 		else
 		{
-			// Command is complete
-			cli_buffer[index] = '\0';
+			if (index != 0)
+				// Command is complete
+				cli_buffer[index] = '\0';
+
+			// if (overwrite_flag)
+			// 	command_history[command_index][0] = '\0';
+
+			command_index += underline_count; // Back to top top result in history
 
 			// Save current buffer
-			for (int i = 0; cli_buffer[i] != '\0'; i++)
+			for (int i = 0; i < strlen(cli_buffer); i++)
 				command_history[command_index][i] = cli_buffer[i];
 			command_index++;
 
 			// Check whether 'help' goes with parameter or not
-			static char temp[10];
+			static char cmd_history_length[10];
 			for (int i = 0; i < 5; i++) // Save the current buffer
-				temp[i] = cli_buffer[i];
+				cmd_history_length[i] = cli_buffer[i];
 
-			if (temp[4] == ' ') // Check for space which means receive another parameter
+			if (cmd_history_length[4] == ' ') // Check for space which means receive another parameter
 			{
-				temp[4] = '\0'; // Enclose the string
-				if (strcmp(temp, "help"))
+				cmd_history_length[4] = '\0'; // Enclose the string
+				if (strcmp(cmd_history_length, "help"))
 					cmd_flag = 'h'; // Turn on 'help' with parameter flag
 			}
-			// Clear temp
-			temp[0] = '\0';
+			// Clear cmd_history_length
+			cmd_history_length[0] = '\0';
 
 			// Check buffer with available commands
 			if (strcmp(cli_buffer, "help") || cmd_flag == 'h') // help
@@ -124,6 +204,17 @@ void cli()
 			else if (strcmp(cli_buffer, "about")) // about
 				show_about();
 
+			else if (strcmp(cli_buffer, "test")) // about
+			{
+				for (int i = 0; i < 20; i++)
+				{
+					uart_puts("\n[");
+					uart_dec(i);
+					uart_puts("] = ");
+					uart_puts(command_history[i]);
+				}
+			}
+
 			// Show error if command not found
 			else
 				show_error(cli_buffer, "is not found. See 'help' to see available commands.");
@@ -135,6 +226,8 @@ void cli()
 			// Emply the buffer
 			cli_buffer[0] = '\0';
 			index = 0;
+
+			underline_count = 0; // Reset the count for command history
 		}
 	}
 }
@@ -142,7 +235,6 @@ void cli()
 // Function for showing a welcome screen when OS boot up
 void show_welcome_screen()
 {
-	clear_screen();
 	show_about(); // Welcome screen
 	uart_puts("\nType 'help' to show list of available commands\n");
 	uart_puts("\n");
@@ -153,7 +245,7 @@ void show_welcome_screen()
 void show_prompt()
 {
 	uart_puts("\x1b[1;34mMoonveil> "); // Bold & Blue foreground text
-	uart_puts("\x1b[0m");			   // Set as default
+	uart_puts("\x1b[0m");			   // Return to default
 }
 
 // Function for output an error message
