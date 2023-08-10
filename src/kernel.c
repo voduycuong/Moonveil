@@ -59,11 +59,9 @@ void cli()
 
 				// Check if user continue to scroll history ('_' is pressed more than once)
 				if (underline_count > 0)
-				{
-					int i;
-					for (i = 0; i < strlen(command_history[command_index + 1]); i++)
+					for (int i = 0; i < strlen(command_history[command_index + 1]); i++)
 						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
-				}
+
 				uart_puts("\033[0K");  // Clear line from cursor right
 				uart_puts(cli_buffer); // Show buffer
 			}
@@ -106,7 +104,6 @@ void cli()
 	// Put into a buffer until got new line character
 	else if (c != '\n')
 	{
-
 		// Check for backspace, if not, continue bufferring
 		if (c != '\b')
 		{
