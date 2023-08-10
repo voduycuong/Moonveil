@@ -22,7 +22,6 @@
     <li>showinfo</li>
     <li>printf</li>
     <li>about</li>
-    <li>test</li>
 </ol>
 
 ##### References 
