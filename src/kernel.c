@@ -25,17 +25,13 @@ void cli()
 	static int cmd_history_length = 0;
 
 	static char cmd_flag = 'x';
-	// static int overwrite_flag = 0;
 
 	static int underline_count = 0;
-	// static int plus_count = 0;
+	static int plus_count = 0;
 
 	// Reset command index if exceeded
 	if (command_index > 20)
-	{
-		// overwrite_flag = 1;
 		command_index = 0;
-	}
 
 	// Read and send back each char
 	char c = uart_getc();
@@ -48,29 +44,11 @@ void cli()
 		if (underline_count < cmd_history_length)
 		{
 			underline_count++;
-
-			// uart_puts("\nUNDERLINE COUNT = ");
-			// uart_dec(underline_count);
-			// uart_puts("\n");
-
 			cli_buffer[0] = '\0';
 
 			if (command_index > 0)
 			{
-
-				// uart_puts("\nUNDERLINE COUNT = ");
-				// uart_dec(underline_count);
-				// uart_puts("\n");
-
 				command_index--; // Go back to previous command
-
-				// uart_puts("COMMAND INDEX = ");
-				// uart_dec(command_index);
-				// uart_puts("\n");
-
-				// uart_puts("COMMAND HISTORY LENGTH = ");
-				// uart_dec(cmd_history_length);
-				// uart_puts("\n");
 
 				// Load command from history into current buffer
 				for (int i = 0; i < strlen(command_history[command_index]); i++)
@@ -90,15 +68,35 @@ void cli()
 				uart_puts(cli_buffer); // Show buffer
 			}
 		}
+	}
 
-		// uart_puts("\nBUFFER LENGTH = ");
-		// uart_dec(strlen(cli_buffer));
-		// uart_puts(" ");
+	else if (c == '+')
+	{
+		if (plus_count < cmd_history_length)
+		{
+			plus_count++;
+			cli_buffer[0] = '\0';
 
-		// uart_puts("\nBUFFER: ");
-		// uart_puts("'");
-		// uart_puts(cli_buffer);
-		// uart_puts("' ");
+			if (command_index < cmd_history_length)
+			{
+				command_index++; // Go to next command
+
+				// Load command from history into current buffer
+				for (int i = 0; i < strlen(command_history[command_index]); i++)
+				{
+					cli_buffer[i] = command_history[command_index][i];
+					cli_buffer[i + 1] = '\0';
+				}
+
+				// Check if user continue to scroll history ('_' is pressed more than once)
+				if (plus_count > 0)
+					for (int i = 0; i < strlen(command_history[command_index - 1]); i++)
+						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+
+				uart_puts("\033[0K");  // Clear line from cursor right
+				uart_puts(cli_buffer); // Show buffer
+			}
+		}
 	}
 
 	// Put into a buffer until got new line character
@@ -135,11 +133,6 @@ void cli()
 	// User input 'return'
 	else if (c == '\n')
 	{
-		// uart_puts("\nBUFFER after RETURN is pressed: ");
-		// uart_puts("'");
-		// uart_puts(cli_buffer);
-		// uart_puts("'\n");
-
 		// Check if none command
 		if (cli_buffer[0] == '\0')
 		{
@@ -155,10 +148,8 @@ void cli()
 				// Command is complete
 				cli_buffer[index] = '\0';
 
-			// if (overwrite_flag)
-			// 	command_history[command_index][0] = '\0';
-
 			command_index += underline_count; // Back to top top result in history
+			command_index -= plus_count;	  // Back to top top result in history
 
 			// Save current buffer
 			for (int i = 0; i < strlen(cli_buffer); i++)
@@ -228,6 +219,7 @@ void cli()
 			index = 0;
 
 			underline_count = 0; // Reset the count for command history
+			plus_count = 0;		 // Reset the count for command history
 		}
 	}
 }
