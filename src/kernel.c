@@ -68,6 +68,8 @@ void cli()
 				uart_puts(cli_buffer); // Show buffer
 			}
 		}
+		else
+			underline_count = cmd_history_length - underline_count;
 	}
 
 	else if (c == '+')
@@ -97,6 +99,8 @@ void cli()
 				uart_puts(cli_buffer); // Show buffer
 			}
 		}
+		else
+			plus_count = cmd_history_length - plus_count;
 	}
 
 	// Put into a buffer until got new line character
