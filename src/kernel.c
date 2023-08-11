@@ -41,9 +41,16 @@ void cli()
 
 	if (c == '_')
 	{
+		underline_count++;
+
+		uart_puts("\nUNDERLINE = ");
+		uart_dec(underline_count);
+		uart_puts(" PLUS COUNT = ");
+		uart_dec(plus_count);
+		uart_puts("\n");
+
 		if (underline_count < cmd_history_length)
 		{
-			underline_count++;
 			cli_buffer[0] = '\0';
 
 			if (command_index > 0)
@@ -67,14 +74,21 @@ void cli()
 			}
 		}
 		else
-			underline_count = cmd_history_length - underline_count;
+			underline_count = command_index;
 	}
 
 	else if (c == '+')
 	{
+		plus_count++;
+
+		uart_puts("\nUNDERLINE = ");
+		uart_dec(underline_count);
+		uart_puts(" PLUS COUNT = ");
+		uart_dec(plus_count);
+		uart_puts("\n");
+
 		if (plus_count < cmd_history_length)
 		{
-			plus_count++;
 			cli_buffer[0] = '\0';
 
 			if (command_index < cmd_history_length)
@@ -98,12 +112,13 @@ void cli()
 			}
 		}
 		else
-			plus_count = cmd_history_length - plus_count;
+			plus_count = command_index;
 	}
 
 	// Put into a buffer until got new line character
 	else if (c != '\n')
 	{
+
 		// Check for backspace, if not, continue bufferring
 		if (c != '\b')
 		{
