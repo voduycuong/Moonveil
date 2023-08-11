@@ -1,5 +1,4 @@
 #include "printf.h"
-#include "uart.h"
 
 #define MAX_PRINT_SIZE 256
 

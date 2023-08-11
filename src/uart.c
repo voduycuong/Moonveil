@@ -1,6 +1,4 @@
-// -----------------------------------uart0.c -------------------------------------
 #include "uart.h"
-#include "gpio.h"
 
 /**
  * Set baud rate and characteristics (115200 8N1) and map to GPIO

@@ -1,5 +1,6 @@
 #include "help.h"
-#include "kernel.h"
+
+extern char *commands[];
 
 // help command
 void show_help(char *buffer, char flag)
@@ -43,7 +44,7 @@ void show_help(char *buffer, char flag)
         uart_puts("\tabout\t\t\t\tShow credit\n");
         uart_puts("\texit\t\t\t\tExit the terminal\n");
         uart_puts("\n");
-        uart_puts("\tHint: Use '_' and '+' to scroll down command history list.\n");
+        uart_puts("\tHint: Use '_' and '+' to go through command history list.\n");
     }
 }
 

@@ -1,5 +1,4 @@
 #include "exit.h"
-#include "uart.h"
 
 void exit()
 {

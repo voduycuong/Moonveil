@@ -263,6 +263,7 @@ void show_prompt(int flag)
 {
 	if (flag == 0)
 	{
+		uart_puts("\x1b[0m");			   // Return to default
 		uart_puts("\x1b[1;34mMoonveil> "); // Bold & Blue foreground text
 		uart_puts("\x1b[0m");			   // Return to default
 	}

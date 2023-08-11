@@ -2,6 +2,7 @@
 #define _MBOX_H
 
 #include "gpio.h"
+#include "uart.h"
 
 /* a properly aligned buffer */
 extern volatile unsigned int mBuf[36];
