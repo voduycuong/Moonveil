@@ -27,13 +27,13 @@ void show_info()
 
         uart_puts("Response Code in Message TAG: ");
         uart_hex(mBuf[4]);
-        uart_puts("\n");
+        uart_puts("\n\n");
 
-        uart_puts("-- Board model: \n\t");
+        uart_puts("Board model: \n\t");
         uart_hex(mBuf[5]);
         uart_puts("\n");
 
-        uart_puts("-- Board MAC address: \n\t");
+        uart_puts("Board MAC address: \n\t");
 
         uart_dec((mBuf[10] & (0xF << 12)) >> 12);
         uart_dec((mBuf[10] & (0xF << 8)) >> 8);
