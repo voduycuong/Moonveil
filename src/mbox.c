@@ -60,7 +60,7 @@ void mailbox_send(uint32_t msg, unsigned char channel)
 int mbox_call(unsigned int buffer_addr, unsigned char channel)
 {
     // Check Buffer Address
-    uart_puts("Buffer Address: ");
+    uart_puts("\nBuffer Address: ");
     uart_hex(buffer_addr);
     uart_sendc('\n');
     // Prepare Data (address of Message Buffer)

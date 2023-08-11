@@ -7,4 +7,5 @@ void exit()
 
 void exit_info()
 {
+    uart_puts("UNDER CONSTRUCTION");
 }

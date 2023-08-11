@@ -160,9 +160,9 @@ void cli()
 				command_history[command_index][i] = cli_buffer[i];
 			command_index++;
 
-			// Check whether 'help' goes with parameter or not
-			static char temp[10];
-			for (int i = 0; i < 5; i++) // Save the current buffer
+			// Check whether command goes with parameter or not
+			static char temp[MAX_CMD_SIZE];
+			for (int i = 0; i < strlen(cli_buffer); i++) // Save the current buffer
 				temp[i] = cli_buffer[i];
 
 			if (temp[4] == ' ') // Check for space which means receive another parameter
@@ -171,24 +171,15 @@ void cli()
 				if (strcmp(temp, commands[0]))
 					cmd_flag = 'h'; // Turn on 'help' with parameter flag
 			}
-
-			// Clear temp
-			temp[0] = '\0';
-
-			// Check whether 'setcolor' goes with parameter or not
-			for (int i = 0; i < 9; i++) // Save the current buffer
-				temp[i] = cli_buffer[i];
-
-			if (temp[8] == ' ') // Check for space which means receive another parameter
+			else if (temp[8] == ' ') // Check for space which means receive another parameter
 			{
 				temp[8] = '\0'; // Enclose the string
 				if (strcmp(temp, commands[2]))
 				{
-					color_flag = 1;
+					color_flag = 1; // Color flag on to bypass default prompt color
 					cmd_flag = 's'; // Turn on 'help' with parameter flag
 				}
 			}
-
 			// Clear temp
 			temp[0] = '\0';
 
