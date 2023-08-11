@@ -26,8 +26,7 @@ void cli()
 
 	static char cmd_flag = 'x';
 
-	static int underline_count = 0;
-	static int plus_count = 0;
+	static int history_index = 0;
 
 	// Reset command index if exceeded
 	if (command_index > 20)
@@ -41,15 +40,14 @@ void cli()
 
 	if (c == '_')
 	{
-		underline_count++;
-
-		uart_puts("\nUNDERLINE = ");
-		uart_dec(underline_count);
-		uart_puts(" PLUS COUNT = ");
-		uart_dec(plus_count);
+		uart_puts("\nHISTORY INDEX = ");
+		uart_dec(history_index);
+		uart_puts("\nCOMMAND INDEX = ");
+		uart_dec(command_index);
 		uart_puts("\n");
+		uart_puts("OUTPUT: ");
 
-		if (underline_count < cmd_history_length)
+		if (command_index <= cmd_history_length)
 		{
 			cli_buffer[0] = '\0';
 
@@ -65,7 +63,7 @@ void cli()
 				}
 
 				// Check if user continue to scroll history ('_' is pressed more than once)
-				if (underline_count > 0)
+				if (command_index > 0)
 					for (int i = 0; i < strlen(command_history[command_index + 1]); i++)
 						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
 
@@ -74,45 +72,7 @@ void cli()
 			}
 		}
 		else
-			underline_count = command_index;
-	}
-
-	else if (c == '+')
-	{
-		plus_count++;
-
-		uart_puts("\nUNDERLINE = ");
-		uart_dec(underline_count);
-		uart_puts(" PLUS COUNT = ");
-		uart_dec(plus_count);
-		uart_puts("\n");
-
-		if (plus_count < cmd_history_length)
-		{
-			cli_buffer[0] = '\0';
-
-			if (command_index < cmd_history_length)
-			{
-				command_index++; // Go to next command
-
-				// Load command from history into current buffer
-				for (int i = 0; i < strlen(command_history[command_index]); i++)
-				{
-					cli_buffer[i] = command_history[command_index][i];
-					cli_buffer[i + 1] = '\0';
-				}
-
-				// Check if user continue to scroll history ('_' is pressed more than once)
-				if (plus_count > 0)
-					for (int i = 0; i < strlen(command_history[command_index - 1]); i++)
-						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
-
-				uart_puts("\033[0K");  // Clear line from cursor right
-				uart_puts(cli_buffer); // Show buffer
-			}
-		}
-		else
-			plus_count = command_index;
+			history_index = command_index;
 	}
 
 	// Put into a buffer until got new line character
@@ -164,27 +124,25 @@ void cli()
 				// Command is complete
 				cli_buffer[index] = '\0';
 
-			command_index += underline_count; // Back to top top result in history
-			command_index -= plus_count;	  // Back to top top result in history
-
 			// Save current buffer
 			for (int i = 0; i < strlen(cli_buffer); i++)
 				command_history[command_index][i] = cli_buffer[i];
 			command_index++;
 
 			// Check whether 'help' goes with parameter or not
-			static char cmd_history_length[10];
+			static char temp[10];
 			for (int i = 0; i < 5; i++) // Save the current buffer
-				cmd_history_length[i] = cli_buffer[i];
+				temp[i] = cli_buffer[i];
 
-			if (cmd_history_length[4] == ' ') // Check for space which means receive another parameter
+			if (temp[4] == ' ') // Check for space which means receive another parameter
 			{
-				cmd_history_length[4] = '\0'; // Enclose the string
-				if (strcmp(cmd_history_length, "help"))
+				temp[4] = '\0'; // Enclose the string
+				if (strcmp(temp, "help"))
 					cmd_flag = 'h'; // Turn on 'help' with parameter flag
 			}
-			// Clear cmd_history_length
-			cmd_history_length[0] = '\0';
+
+			// Clear temp
+			temp[0] = '\0';
 
 			// Check buffer with available commands
 			if (strcmp(cli_buffer, "help") || cmd_flag == 'h') // help
@@ -196,7 +154,7 @@ void cli()
 			else if (strcmp(cli_buffer, "clear")) // clear
 				clear_screen();
 
-			else if (strcmp(cli_buffer, "setcolor")) // setcolor
+			else if (strcmp(cli_buffer, "setcolor") || cmd_flag == 't' || cmd_flag == 'b') // setcolor
 			{
 				show_error(cli_buffer, "must go with parameter(s). See 'help setcolor'.");
 				set_color(cli_buffer, cmd_flag);
@@ -233,9 +191,6 @@ void cli()
 			// Emply the buffer
 			cli_buffer[0] = '\0';
 			index = 0;
-
-			underline_count = 0; // Reset the count for command history
-			plus_count = 0;		 // Reset the count for command history
 		}
 	}
 }

@@ -3,7 +3,10 @@
 // setcolor command
 void set_color(char *buffer, char flag)
 {
-    uart_puts("\x1b[32mtesting\n");
+    if (flag = 's')
+    {
+        uart_puts("\x1b[32mtesting\n");
+    }
 }
 
 // setcolor command info
