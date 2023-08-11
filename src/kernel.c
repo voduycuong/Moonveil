@@ -1,6 +1,6 @@
 #include "kernel.h"
 
-char *commands[] = {"help", "clear", "setcolor", "showinfo", "printf", "about", "exit", "test"};
+char *commands[] = {"help", "clear", "setcolor", "showinfo", "about", "exit", "test"};
 char *colors[] = {"black", "red", "green", "yellow", "blue", "purple", "cyan", "white"};
 int color_flag = 0;
 
@@ -68,8 +68,6 @@ void cli()
 				}
 				uart_puts("\033[0K");  // Clear line from cursor right
 				uart_puts(cli_buffer); // Show buffer
-
-				// index = strlen(cli_buffer) + 1;
 			}
 		}
 	}
@@ -98,8 +96,6 @@ void cli()
 
 				uart_puts("\033[0K");  // Clear line from cursor right
 				uart_puts(cli_buffer); // Show buffer
-
-				// index = strlen(cli_buffer);
 			}
 		}
 	}
@@ -202,24 +198,23 @@ void cli()
 			else if (strcmp(cli_buffer, commands[3])) // showinfo
 				show_info();
 
-			// else if (strcmp(cli_buffer, commands[4])) // printf
-			// 	printf();
-
-			else if (strcmp(cli_buffer, commands[5])) // about
+			else if (strcmp(cli_buffer, commands[4])) // about
 				show_about();
 
-			else if (strcmp(cli_buffer, commands[6])) // exit
+			else if (strcmp(cli_buffer, commands[5])) // exit
 				exit();
 
-			else if (strcmp(cli_buffer, commands[7])) // test
+			else if (strcmp(cli_buffer, commands[6])) // test
 			{
-				for (int i = 0; i < 20; i++)
-				{
-					uart_puts("\n[");
-					uart_dec(i);
-					uart_puts("] = ");
-					uart_puts(command_history[i]);
-				}
+				// for (int i = 0; i < 20; i++)
+				// {
+				// 	uart_puts("\n[");
+				// 	uart_dec(i);
+				// 	uart_puts("] = ");
+				// 	uart_puts(command_history[i]);
+				// }
+
+				printf(" %d", command_index);
 			}
 
 			// Show error if command not found

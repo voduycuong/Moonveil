@@ -7,6 +7,5 @@
 #include "uart.h"
 
 void printf(char *string, ...);
-void printf_info();
 
 #endif

@@ -20,7 +20,6 @@
     <li>clear</li>
     <li>setcolor</li>
     <li>showinfo</li>
-    <li>printf</li>
     <li>about</li>
 </ol>
 
