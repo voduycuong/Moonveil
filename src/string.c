@@ -38,11 +38,3 @@ int strlen(char *string)
         length++;
     return length;
 }
-
-/* Function for searching a string in a string array
- * return its index if found
- * return 0 if not found
- */
-// int search_str(char *source, char *keyword)
-// {
-// }

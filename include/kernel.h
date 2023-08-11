@@ -14,12 +14,13 @@
 #include "exit.h"
 
 extern char *commands[];
+extern char *colors[];
 
 #define MAX_CMD_SIZE 100
 
-extern void cli();
+void cli();
 void show_welcome_screen();
-void show_prompt();
+void show_prompt(int flag);
 void show_error(char *cmd, char *error_message);
 
 #endif

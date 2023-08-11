@@ -1,6 +1,8 @@
 #include "kernel.h"
 
 char *commands[] = {"help", "clear", "setcolor", "showinfo", "printf", "about", "exit", "test"};
+char *colors[] = {"black", "red", "green", "yellow", "blue", "purple", "cyan", "white"};
+int color_flag = 0;
 
 void main()
 {
@@ -27,8 +29,8 @@ void cli()
 	static int cmd_history_length = 0;
 
 	static char cmd_flag = 'x';
-
-	static int history_index = 0;
+	static int underline_count = 0;
+	static int plus_count = 0;
 
 	// Reset command index if exceeded
 	if (command_index > 20)
@@ -42,15 +44,9 @@ void cli()
 
 	if (c == '_')
 	{
-		uart_puts("\nHISTORY INDEX = ");
-		uart_dec(history_index);
-		uart_puts("\nCOMMAND INDEX = ");
-		uart_dec(command_index);
-		uart_puts("\n");
-		uart_puts("OUTPUT: ");
-
-		if (command_index <= cmd_history_length)
+		if (underline_count < cmd_history_length)
 		{
+			underline_count++;
 			cli_buffer[0] = '\0';
 
 			if (command_index > 0)
@@ -63,24 +59,54 @@ void cli()
 					cli_buffer[i] = command_history[command_index][i];
 					cli_buffer[i + 1] = '\0';
 				}
-
 				// Check if user continue to scroll history ('_' is pressed more than once)
-				if (command_index > 0)
-					for (int i = 0; i < strlen(command_history[command_index + 1]); i++)
+				if (underline_count > 0)
+				{
+					int i;
+					for (i = 0; i < strlen(command_history[command_index + 1]); i++)
+						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+				}
+				uart_puts("\033[0K");  // Clear line from cursor right
+				uart_puts(cli_buffer); // Show buffer
+
+				// index = strlen(cli_buffer) + 1;
+			}
+		}
+	}
+
+	else if (c == '+')
+	{
+		if (plus_count < cmd_history_length)
+		{
+			plus_count++;
+			cli_buffer[0] = '\0';
+
+			if (command_index < cmd_history_length)
+			{
+				command_index++; // Go to next command
+
+				// Load command from history into current buffer
+				for (int i = 0; i < strlen(command_history[command_index]); i++)
+				{
+					cli_buffer[i] = command_history[command_index][i];
+					cli_buffer[i + 1] = '\0';
+				}
+				// Check if user continue to scroll history ('_' is pressed more than once)
+				if (plus_count > 0)
+					for (int i = 0; i < strlen(command_history[command_index - 1]); i++)
 						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
 
 				uart_puts("\033[0K");  // Clear line from cursor right
 				uart_puts(cli_buffer); // Show buffer
+
+				// index = strlen(cli_buffer);
 			}
 		}
-		else
-			history_index = command_index;
 	}
 
 	// Put into a buffer until got new line character
 	else if (c != '\n')
 	{
-
 		// Check for backspace, if not, continue bufferring
 		if (c != '\b')
 		{
@@ -116,7 +142,7 @@ void cli()
 		{
 			// Return to command line
 			uart_puts("\n");
-			show_prompt();
+			show_prompt(color_flag);
 			index = 0;
 		}
 
@@ -125,6 +151,9 @@ void cli()
 			if (index != 0)
 				// Command is complete
 				cli_buffer[index] = '\0';
+
+			command_index += underline_count; // Back to top top result in history
+			command_index -= plus_count;	  // Back to top top result in history
 
 			// Save current buffer
 			for (int i = 0; i < strlen(cli_buffer); i++)
@@ -139,7 +168,7 @@ void cli()
 			if (temp[4] == ' ') // Check for space which means receive another parameter
 			{
 				temp[4] = '\0'; // Enclose the string
-				if (strcmp(temp, "help"))
+				if (strcmp(temp, commands[0]))
 					cmd_flag = 'h'; // Turn on 'help' with parameter flag
 			}
 
@@ -147,48 +176,51 @@ void cli()
 			temp[0] = '\0';
 
 			// Check whether 'setcolor' goes with parameter or not
-			for (int i = 0; i < 5; i++) // Save the current buffer
+			for (int i = 0; i < 9; i++) // Save the current buffer
 				temp[i] = cli_buffer[i];
 
 			if (temp[8] == ' ') // Check for space which means receive another parameter
 			{
 				temp[8] = '\0'; // Enclose the string
-				if (strcmp(temp, "setcolor"))
+				if (strcmp(temp, commands[2]))
+				{
+					color_flag = 1;
 					cmd_flag = 's'; // Turn on 'help' with parameter flag
+				}
 			}
 
 			// Clear temp
 			temp[0] = '\0';
 
 			// Check buffer with available commands
-			if (strcmp(cli_buffer, "help") || cmd_flag == 'h') // help
+			if (strcmp(cli_buffer, commands[0]) || cmd_flag == 'h') // help
 			{
 				show_help(cli_buffer, cmd_flag);
 				cmd_flag = 'x';
 			}
 
-			else if (strcmp(cli_buffer, "clear")) // clear
+			else if (strcmp(cli_buffer, commands[1])) // clear
 				clear_screen();
 
-			else if (strcmp(cli_buffer, "setcolor") || cmd_flag == 's') // setcolor
+			else if (strcmp(cli_buffer, commands[2]) || cmd_flag == 's') // setcolor
 			{
 				set_color(cli_buffer, cmd_flag);
 				cmd_flag = 'x';
 			}
 
-			else if (strcmp(cli_buffer, "showinfo")) // showinfo
+			else if (strcmp(cli_buffer, commands[3])) // showinfo
 				show_info();
 
-			// else if (strcmp(cli_buffer, "printf")) // printf
+			// else if (strcmp(cli_buffer, commands[4])) // printf
 			// 	printf();
 
-			else if (strcmp(cli_buffer, "about")) // about
+			else if (strcmp(cli_buffer, commands[5])) // about
 				show_about();
 
-			else if (strcmp(cli_buffer, "exit")) // exit
+			else if (strcmp(cli_buffer, commands[6])) // exit
 				exit();
 
-			else if (strcmp(cli_buffer, "test")) // test
+			else if (strcmp(cli_buffer, commands[7])) // test
 			{
 				for (int i = 0; i < 20; i++)
 				{
@@ -205,11 +237,14 @@ void cli()
 
 			// Return to command line
 			uart_puts("\n");
-			show_prompt();
+			show_prompt(color_flag);
 
 			// Emply the buffer
 			cli_buffer[0] = '\0';
 			index = 0;
+
+			underline_count = 0; // Reset the count for command history
+			plus_count = 0;		 // Reset the count for command history
 		}
 	}
 }
@@ -220,14 +255,19 @@ void show_welcome_screen()
 	show_about(); // Welcome screen
 	uart_puts("\nType 'help' to show list of available commands\n");
 	uart_puts("\n");
-	show_prompt();
+	show_prompt(0);
 }
 
 // Function for showing prompt at the beginning of each command
-void show_prompt()
+void show_prompt(int flag)
 {
-	uart_puts("\x1b[1;34mMoonveil> "); // Bold & Blue foreground text
-	uart_puts("\x1b[0m");			   // Return to default
+	if (flag == 0)
+	{
+		uart_puts("\x1b[1;34mMoonveil> "); // Bold & Blue foreground text
+		uart_puts("\x1b[0m");			   // Return to default
+	}
+	else
+		uart_puts("Moonveil> ");
 }
 
 // Function for output an error message
