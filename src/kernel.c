@@ -1,5 +1,7 @@
 #include "kernel.h"
 
+char *commands[] = {"help", "clear", "setcolor", "showinfo", "printf", "about", "exit", "test"};
+
 void main()
 {
 	// Set up serial console
@@ -144,6 +146,20 @@ void cli()
 			// Clear temp
 			temp[0] = '\0';
 
+			// Check whether 'setcolor' goes with parameter or not
+			for (int i = 0; i < 5; i++) // Save the current buffer
+				temp[i] = cli_buffer[i];
+
+			if (temp[8] == ' ') // Check for space which means receive another parameter
+			{
+				temp[8] = '\0'; // Enclose the string
+				if (strcmp(temp, "setcolor"))
+					cmd_flag = 's'; // Turn on 'help' with parameter flag
+			}
+
+			// Clear temp
+			temp[0] = '\0';
+
 			// Check buffer with available commands
 			if (strcmp(cli_buffer, "help") || cmd_flag == 'h') // help
 			{
@@ -154,10 +170,10 @@ void cli()
 			else if (strcmp(cli_buffer, "clear")) // clear
 				clear_screen();
 
-			else if (strcmp(cli_buffer, "setcolor") || cmd_flag == 't' || cmd_flag == 'b') // setcolor
+			else if (strcmp(cli_buffer, "setcolor") || cmd_flag == 's') // setcolor
 			{
-				show_error(cli_buffer, "must go with parameter(s). See 'help setcolor'.");
 				set_color(cli_buffer, cmd_flag);
+				cmd_flag = 'x';
 			}
 
 			else if (strcmp(cli_buffer, "showinfo")) // showinfo
@@ -169,7 +185,10 @@ void cli()
 			else if (strcmp(cli_buffer, "about")) // about
 				show_about();
 
-			else if (strcmp(cli_buffer, "test")) // about
+			else if (strcmp(cli_buffer, "exit")) // exit
+				exit();
+
+			else if (strcmp(cli_buffer, "test")) // test
 			{
 				for (int i = 0; i < 20; i++)
 				{

@@ -1,12 +1,18 @@
 #include "setcolor.h"
+#include "kernel.h"
 
 // setcolor command
 void set_color(char *buffer, char flag)
 {
-    if (flag = 's')
+    if (flag == 's')
     {
-        uart_puts("\x1b[32mtesting\n");
+        if (strcmp(subst(buffer, 5), "help")) // help command in detail
+        {
+        }
+        // uart_puts("\x1b[32mtesting\n");
     }
+    else if (flag == 'x')
+        uart_puts("\n'setcolor' must go with parameter(s). See 'help setcolor'.");
 }
 
 // setcolor command info
