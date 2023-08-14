@@ -22,24 +22,24 @@ void main()
 void cli()
 {
 	static char cli_buffer[MAX_CMD_SIZE];
-	static char command_history[20][MAX_CMD_SIZE]; // Max history is 20 commands
+	static char cmd_history[20][MAX_CMD_SIZE]; // Max history is 20 commands
 
 	static int index = 0;
-	static int command_index = 0;
+	static int cmd_index = 0;
 	static int cmd_history_length = 0;
 
-	static char cmd_flag = 'x';
+	static char cmd_option = 'x';
 	static int underline_count = 0;
 	static int plus_count = 0;
 
 	// Reset command index if exceeded
-	if (command_index > 20)
-		command_index = 0;
+	if (cmd_index > 20)
+		cmd_index = 0;
 
 	// Read and send back each char
 	char c = uart_getc();
 
-	while (command_history[cmd_history_length][0] != '\0')
+	while (cmd_history[cmd_history_length][0] != '\0')
 		cmd_history_length++;
 
 	if (c == '_')
@@ -49,25 +49,21 @@ void cli()
 			underline_count++;
 			cli_buffer[0] = '\0';
 
-			if (command_index > 0)
+			if (cmd_index > 0)
 			{
-				command_index--; // Go back to previous command
+				cmd_index--; // Go back to previous command
 
 				// Load command from history into current buffer
-				for (int i = 0; i < strlen(command_history[command_index]); i++)
+				for (int i = 0; i < strlen(cmd_history[cmd_index]); i++)
 				{
-					cli_buffer[i] = command_history[command_index][i];
+					cli_buffer[i] = cmd_history[cmd_index][i];
 					cli_buffer[i + 1] = '\0';
 				}
 				// Check if user continue to scroll history ('_' is pressed more than once)
-				if (underline_count > 0)
-				{
-					int i;
-					for (i = 0; i < strlen(command_history[command_index + 1]); i++)
-						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
-				}
-				uart_puts("\033[0K");  // Clear line from cursor right
-				uart_puts(cli_buffer); // Show buffer
+				for (int i = 0; i < strlen(cmd_history[cmd_index + 1]); i++)
+					uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+				uart_puts("\033[0K");	  // Clear line from cursor right
+				uart_puts(cli_buffer);	  // Show buffer
 			}
 		}
 	}
@@ -79,20 +75,19 @@ void cli()
 			plus_count++;
 			cli_buffer[0] = '\0';
 
-			if (command_index < cmd_history_length)
+			if (cmd_index < cmd_history_length)
 			{
-				command_index++; // Go to next command
+				cmd_index++; // Go to next command
 
 				// Load command from history into current buffer
-				for (int i = 0; i < strlen(command_history[command_index]); i++)
+				for (int i = 0; i < strlen(cmd_history[cmd_index]); i++)
 				{
-					cli_buffer[i] = command_history[command_index][i];
+					cli_buffer[i] = cmd_history[cmd_index][i];
 					cli_buffer[i + 1] = '\0';
 				}
 				// Check if user continue to scroll history ('_' is pressed more than once)
-				if (plus_count > 0)
-					for (int i = 0; i < strlen(command_history[command_index - 1]); i++)
-						uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+				for (int i = 0; i < strlen(cmd_history[cmd_index - 1]); i++)
+					uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
 
 				uart_puts("\033[0K");  // Clear line from cursor right
 				uart_puts(cli_buffer); // Show buffer
@@ -103,8 +98,30 @@ void cli()
 	// Put into a buffer until got new line character
 	else if (c != '\n')
 	{
+		if (c == '\t')
+		{
+			if (cli_buffer[0] != '\0')
+			{
+				int p, q, r;
+				for (p = 0; p < 6; p++)
+					if (strsearch(commands[p], cli_buffer))
+						break;
+
+				for (r = 0; r < strlen(cli_buffer); r++)
+					uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+				uart_puts("\033[0K");	  // Clear line from cursor right
+
+				for (q = 0; q < strlen(commands[p]); q++)
+					cli_buffer[q] = commands[p][q];
+
+				cli_buffer[strlen(commands[p])] = '\0';
+
+				uart_puts(cli_buffer);
+			}
+		}
+
 		// Check for backspace, if not, continue bufferring
-		if (c != '\b')
+		else if (c != '\b')
 		{
 			uart_sendc(c);
 			cli_buffer[index] = c; // Store into the buffer
@@ -148,13 +165,13 @@ void cli()
 				// Command is complete
 				cli_buffer[index] = '\0';
 
-			command_index += underline_count; // Back to top top result in history
-			command_index -= plus_count;	  // Back to top top result in history
+			cmd_index += underline_count; // Back to top top result in history
+			cmd_index -= plus_count;	  // Back to top top result in history
 
 			// Save current buffer
 			for (int i = 0; i < strlen(cli_buffer); i++)
-				command_history[command_index][i] = cli_buffer[i];
-			command_index++;
+				cmd_history[cmd_index][i] = cli_buffer[i];
+			cmd_index++;
 
 			// Check whether command goes with parameter or not
 			static char temp[MAX_CMD_SIZE];
@@ -165,34 +182,34 @@ void cli()
 			{
 				temp[4] = '\0'; // Enclose the string
 				if (strcmp(temp, commands[0]))
-					cmd_flag = 'h'; // Turn on 'help' with parameter flag
+					cmd_option = 'h'; // Turn on 'help' with parameter flag
 			}
 			else if (temp[8] == ' ') // Check for space which means receive another parameter
 			{
 				temp[8] = '\0'; // Enclose the string
 				if (strcmp(temp, commands[2]))
 				{
-					color_flag = 1; // Color flag on to bypass default prompt color
-					cmd_flag = 's'; // Turn on 'help' with parameter flag
+					color_flag = 1;	  // Color flag on to bypass default prompt color
+					cmd_option = 's'; // Turn on 'help' with parameter flag
 				}
 			}
 			// Clear temp
 			temp[0] = '\0';
 
 			// Check buffer with available commands
-			if (strcmp(cli_buffer, commands[0]) || cmd_flag == 'h') // help
+			if (strcmp(cli_buffer, commands[0]) || cmd_option == 'h') // help
 			{
-				show_help(cli_buffer, cmd_flag);
-				cmd_flag = 'x';
+				show_help(cli_buffer, cmd_option);
+				cmd_option = 'x';
 			}
 
 			else if (strcmp(cli_buffer, commands[1])) // clear
 				clear_screen();
 
-			else if (strcmp(cli_buffer, commands[2]) || cmd_flag == 's') // setcolor
+			else if (strcmp(cli_buffer, commands[2]) || cmd_option == 's') // setcolor
 			{
-				set_color(cli_buffer, cmd_flag);
-				cmd_flag = 'x';
+				set_color(cli_buffer, cmd_option);
+				cmd_option = 'x';
 			}
 
 			else if (strcmp(cli_buffer, commands[3])) // showinfo
@@ -211,10 +228,10 @@ void cli()
 				// 	uart_puts("\n[");
 				// 	uart_dec(i);
 				// 	uart_puts("] = ");
-				// 	uart_puts(command_history[i]);
+				// 	uart_puts(cmd_history[i]);
 				// }
 
-				printf(" %d", command_index);
+				printf(" %d", cmd_index);
 			}
 
 			// Show error if command not found
@@ -239,7 +256,7 @@ void cli()
 void show_welcome_screen()
 {
 	show_about(); // Welcome screen
-	uart_puts("\nType 'help' to show list of available commands\n");
+	uart_puts("\n\tType 'help' to show list of available commands\n");
 	uart_puts("\n");
 	show_prompt(0);
 }

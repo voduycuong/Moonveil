@@ -1,3 +1,4 @@
+// -----------------------------------uart0.c -------------------------------------
 #include "uart.h"
 
 /**
@@ -10,34 +11,34 @@ void uart_init()
 	/* Turn off UART0 */
 	UART0_CR = 0x0;
 
-	/* Setup GPIO pins 32 and 33 */
+	/* Setup GPIO pins 14 and 15 */
 
-	/* Set GPIO32 and GPIO33 to be PL011 TX/RX which is ALT3 */
-	r = GPFSEL3;
-	r &= ~((7 << 6) | (7 << 9)); // Clear bits 11-6 (GPIO32, GPIO33)
-	r |= (7 << 6) | (7 << 9);	 // Set value 7 (0b111 - ALT3: UART0)
-	GPFSEL3 = r;
+	/* Set GPIO14 and GPIO15 to be PL011 TX/RX which is ALT0 */
+	r = GPFSEL1;
+	r &= ~((7 << 12) | (7 << 15)); // Clear bits 12-17 (GPIO14, GPIO15)
+	r |= (4 << 12) | (4 << 15);	   // Set value 4 (0b100 - ALT0: UART0)
+	GPFSEL1 = r;
 
 #ifdef RPI3 // RBP3
-	/* enable GPIO 32, 33 */
+	/* enable GPIO 14, 15 */
 	GPPUD = 0; // No pull up/down control
 	r = 150;
 	while (r--)
 	{
 		asm volatile("nop");
-	}								 // waiting 150 cycles
-	GPPUDCLK1 = (1 << 0) | (1 << 1); // enable clock for GPIO 32, 33
+	}								   // waiting 150 cycles
+	GPPUDCLK0 = (1 << 14) | (1 << 15); // enable clock for GPIO 14, 15
 	r = 150;
 	while (r--)
 	{
 		asm volatile("nop");
 	}			   // waiting 150 cycles
-	GPPUDCLK1 = 0; // flush GPIO setup
+	GPPUDCLK0 = 0; // flush GPIO setup
 
 #else // RPB4
-	r = GPIO_PUP_PDN_CNTRL_REG2;
-	r &= ~((3 << 0) | (3 << 2)); // Clear Resistor Select for GPIO 14, 15
-	GPIO_PUP_PDN_CNTRL_REG2 = r;
+	r = GPIO_PUP_PDN_CNTRL_REG0;
+	r &= ~((3 << 28) | (3 << 30)); // Clear Resistor Select for GPIO 14, 15
+	GPIO_PUP_PDN_CNTRL_REG0 = r;
 #endif
 
 	/* Mask all interrupts. */
@@ -48,16 +49,13 @@ void uart_init()
 
 	/* Set integer & fractional part of Baud rate
 	Divider = UART_CLOCK/(16 * Baud)
-			= 48 * 10^6/ (16 * 38400) = 78.125
 	Default UART_CLOCK = 48MHz (old firmware it was 3MHz);
 	Integer part register UART0_IBRD  = integer part of Divider
-	Fraction part register UART0_FBRD = (Fractional part * 64) + 0.5
-									  = (0.125 * 64) + 0.5
-									  = 8.5 */
+	Fraction part register UART0_FBRD = (Fractional part * 64) + 0.5 */
 
-	// 38400 baud
-	UART0_IBRD = 78;
-	UART0_FBRD = 9;
+	// 115200 baud
+	UART0_IBRD = 26;
+	UART0_FBRD = 3;
 
 	/* Set up the Line Control Register */
 	/* Enable FIFO */
@@ -121,43 +119,43 @@ void uart_puts(char *s)
 }
 
 /**
- * Display a binary value in hexadecimal
+ * Display a value in hexadecimal format
  */
-void uart_hex(unsigned int d)
+void uart_hex(unsigned int num)
 {
-	unsigned int n;
-	int c;
 	uart_puts("0x");
-	for (c = 28; c >= 0; c = c - 4)
+	for (int pos = 28; pos >= 0; pos = pos - 4)
 	{
 		// Get highest 4-bit nibble
-		n = (d >> c) & 0xF;
+		char digit = (num >> pos) & 0xF;
+		/* Convert to ASCII code */
 		// 0-9 => '0'-'9', 10-15 => 'A'-'F'
-		n += (n > 9) ? (-10 + 'A') : '0';
-		uart_sendc(n);
+		digit += (digit > 9) ? (-10 + 'A') : '0';
+		uart_sendc(digit);
 	}
 }
 
 /**
- * Display a value in decimal by
+ * Display a value in decimal format
  */
 void uart_dec(int num)
 {
+	// A string to store the digit characters
 	char str[33] = "";
-	int i, rem, len = 0, n;
-	n = num;
-	while (n != 0)
+	// Calculate the number of digits
+	int len = 1;
+	int temp = num;
+	while (temp >= 10)
 	{
 		len++;
-		n /= 10;
+		temp = temp / 10;
 	}
-	if (num == 0)
-		len = 1;
-	for (i = 0; i < len; i++)
+	// Store into the string and print out
+	for (int i = 0; i < len; i++)
 	{
-		rem = num % 10;
-		num = num / 10;
-		str[len - (i + 1)] = rem + '0';
+		int digit = num % 10; // get last digit
+		num = num / 10;		  // remove last digit from the number
+		str[len - (i + 1)] = digit + '0';
 	}
 	str[len] = '\0';
 	uart_puts(str);

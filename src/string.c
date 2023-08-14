@@ -38,3 +38,13 @@ int strlen(char *string)
         length++;
     return length;
 }
+
+int strsearch(char *string, char *keyword)
+{
+    for (int i = 0; i < strlen(keyword); i++)
+    {
+        if (keyword[i] != string[i])
+            return 0;
+    }
+    return 1;
+}

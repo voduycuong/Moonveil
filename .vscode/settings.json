@@ -8,7 +8,8 @@
         "help.h": "c",
         "setcolor.h": "c",
         "about.h": "c",
-        "mbox.h": "c"
+        "mbox.h": "c",
+        "printf.h": "c"
     },
     "cmake.configureOnOpen": false
 }
