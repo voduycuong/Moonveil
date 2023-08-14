@@ -9,7 +9,8 @@
         "setcolor.h": "c",
         "about.h": "c",
         "mbox.h": "c",
-        "printf.h": "c"
+        "printf.h": "c",
+        "gpio.h": "c"
     },
     "cmake.configureOnOpen": false
 }

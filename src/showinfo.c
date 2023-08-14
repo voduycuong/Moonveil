@@ -36,23 +36,11 @@ void show_info()
         uart_puts("\n");
 
         uart_puts("Board MAC address: \n\t");
-        uart_dec((mBuf[10] & (0xF << 12)) >> 12);
-        uart_dec((mBuf[10] & (0xF << 8)) >> 8);
+
+        uart_macaddr(mBuf[10], 12);
         uart_sendc(':');
-        uart_dec((mBuf[10] & (0xF << 4)) >> 4);
-        uart_dec(mBuf[10] & 0xF);
-        uart_sendc(':');
-        uart_dec((mBuf[9] & (0xF << 28)) >> 28);
-        uart_dec((mBuf[9] & (0xF << 24)) >> 24);
-        uart_sendc(':');
-        uart_dec((mBuf[9] & (0xF << 20)) >> 20);
-        uart_dec((mBuf[9] & (0xF << 16)) >> 16);
-        uart_sendc(':');
-        uart_dec((mBuf[9] & (0xF << 12)) >> 12);
-        uart_dec((mBuf[9] & (0xF << 8)) >> 8);
-        uart_sendc(':');
-        uart_dec((mBuf[9] & (0xF << 4)) >> 4);
-        uart_dec(mBuf[9] & 0xF);
+        uart_macaddr(mBuf[9], 28);
+        uart_puts("\n");
 
         uart_puts("\n");
     }

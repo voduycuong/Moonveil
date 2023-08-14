@@ -136,6 +136,29 @@ void uart_hex(unsigned int num)
 }
 
 /**
+ * Display a value in hexadecimal
+ */
+void uart_macaddr(unsigned int num, unsigned int pos)
+{
+	uint32_t put_colon = 0;
+	for (int i = pos; i >= 0; i = i - 4)
+	{
+		// Get highest 4-bit nibble
+		char digit = (num >> i) & 0xF;
+		/* Convert to ASCII code */
+		// 0-9 => '0'-'9', 10-15 => 'A'-'F'
+		digit += (digit > 9) ? (-10 + 'A') : '0';
+		uart_sendc(digit);
+		put_colon++;
+		if (put_colon == 2 && i != 0)
+		{
+			uart_sendc(':');
+			put_colon = 0;
+		}
+	}
+}
+
+/**
  * Display a value in decimal format
  */
 void uart_dec(int num)
