@@ -12,6 +12,7 @@
 #include "printf.h"
 #include "about.h"
 #include "exit.h"
+#include "test.h"
 
 extern char *commands[];
 extern char *colors[];

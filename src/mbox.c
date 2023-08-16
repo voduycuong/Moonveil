@@ -104,9 +104,7 @@ void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...)
             break;
 
         if (x != 0)
-        {
             mBuf[i++] = x;
-        }
     }
 
     mBuf[i++] = MBOX_TAG_LAST;
