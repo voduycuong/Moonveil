@@ -3,24 +3,27 @@
 
 #include "gpio.h"
 #include "uart.h"
+#include "./gcclib/stddef.h"
+#include "./gcclib/stdint.h"
+#include "./gcclib/stdarg.h"
 
 /* a properly aligned buffer */
-extern volatile unsigned int mBuf[36];
+extern volatile uint32_t mBuf[36];
 
-#define ADDR(X) (unsigned int)((unsigned long)X)
+#define ADDR(X) (uint32_t)((unsigned long)X)
 
 /* Registers */
 #define VIDEOCORE_MBOX (MMIO_BASE + 0x0000B880)
-#define MBOX0_READ ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x00))
-#define MBOX0_PEEK ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x10))
-#define MBOX0_SENDER ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x14))
-#define MBOX0_STATUS ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x18))
-#define MBOX0_CONFIG ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x1C))
-#define MBOX1_WRITE ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x20))
-#define MBOX1_PEEK ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x30))
-#define MBOX1_SENDER ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x34))
-#define MBOX1_STATUS ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x38))
-#define MBOX1_CONFIG ((volatile unsigned int *)(VIDEOCORE_MBOX + 0x3C))
+#define MBOX0_READ ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x00))
+#define MBOX0_PEEK ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x10))
+#define MBOX0_SENDER ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x14))
+#define MBOX0_STATUS ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x18))
+#define MBOX0_CONFIG ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x1C))
+#define MBOX1_WRITE ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x20))
+#define MBOX1_PEEK ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x30))
+#define MBOX1_SENDER ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x34))
+#define MBOX1_STATUS ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x38))
+#define MBOX1_CONFIG ((volatile uint32_t *)(VIDEOCORE_MBOX + 0x3C))
 
 // Request/Response code in Buffer content
 #define MBOX_RESPONSE 0x80000000
@@ -41,12 +44,16 @@ extern volatile unsigned int mBuf[36];
 #define MBOX_CH_PROP 8  // Property tags (ARM -> VC)
 
 /* tags */
-#define MBOX_TAG_GETSERIAL 0x00010004 // Get board serial
-#define MBOX_TAG_GETMODEL 0x00010001  // Get board serial
+#define MBOX_TAG_GETFIRMWARE 0x00000001 // Get firmware revision
+#define MBOX_TAG_GETSERIAL 0x00010004   // Get board serial
+#define MBOX_TAG_GETMODEL 0x00010001    // Get board model
+#define MBOX_TAG_GETREVISION 0x00010002 // Get board revision
+#define MBOX_TAG_GETMACADDR 0x00010003  // Get board MAC address
 #define MBOX_TAG_SETCLKRATE 0x00038002
 #define MBOX_TAG_LAST 0
 
 /* Function Prototypes */
-int mbox_call(unsigned int buffer_addr, unsigned char channel);
+int mbox_call(uint32_t buffer_addr, unsigned char channel);
+void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t **res_data, ...);
 
 #endif

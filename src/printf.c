@@ -66,26 +66,27 @@ void printf(char *string, ...)
 			}
 
 			else if (*string == 'x')
-			{
-				string++;
-				int x = va_arg(ap, int);
-				int temp_index = MAX_PRINT_SIZE - 1;
-				static char hex_char[] = "0123456789ABCDEF";
-
-				do
+				y
 				{
-					temp_buffer[temp_index] = hex_char[x % 16];
-					temp_index--;
-					x /= 16;
-				} while (x != 0);
+					string++;
+					int x = va_arg(ap, int);
+					int temp_index = MAX_PRINT_SIZE - 1;
+					static char hex_char[] = "0123456789ABCDEF";
 
-				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
-				{
-					buffer[buffer_index] = temp_buffer[i];
-					buffer_index++;
+					do
+					{
+						temp_buffer[temp_index] = hex_char[x % 16];
+						temp_index--;
+						x /= 16;
+					} while (x != 0);
+
+					for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
+					{
+						buffer[buffer_index] = temp_buffer[i];
+						buffer_index++;
+					}
+					uart_puts("0x");
 				}
-				uart_puts("0x");
-			}
 
 			else if (*string == '%')
 			{

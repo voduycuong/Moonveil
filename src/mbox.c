@@ -16,7 +16,7 @@
  *
  */
 
-volatile unsigned int __attribute__((aligned(16))) mBuf[36];
+volatile uint32_t __attribute__((aligned(16))) mBuf[36];
 
 /**
  * Read from the mailbox
@@ -57,14 +57,14 @@ void mailbox_send(uint32_t msg, unsigned char channel)
 /**
  * Make a mailbox call. Returns 0 on failure, non-zero on success
  */
-int mbox_call(unsigned int buffer_addr, unsigned char channel)
+int mbox_call(uint32_t buffer_addr, unsigned char channel)
 {
     // Check Buffer Address
     uart_puts("\nBuffer Address: ");
     uart_hex(buffer_addr);
     uart_sendc('\n');
     // Prepare Data (address of Message Buffer)
-    unsigned int msg = (buffer_addr & ~0xF) | (channel & 0xF);
+    uint32_t msg = (buffer_addr & ~0xF) | (channel & 0xF);
     mailbox_send(msg, channel);
     /* now wait for the response */
     /* is it a response to our message (same address)? */
@@ -76,4 +76,14 @@ int mbox_call(unsigned int buffer_addr, unsigned char channel)
         return (mBuf[1] == MBOX_RESPONSE);
     }
     return 0;
+}
+/*
+ * Make a mailbox setup
+ * buffer_addr: address of the being used mailbox buffer
+ * tag_identifier: TAG indentifier value
+ * res_data: pointer of pointer, used to get the first address of response data
+ * ...: list of parameters for request values (if necessary).
+ */
+void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t **res_data, ...)
+{
 }
