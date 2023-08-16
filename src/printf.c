@@ -47,13 +47,15 @@ void printf(char *string, ...)
 
 			else if (*string == 'c')
 			{
+				string++;
 				int x = va_arg(ap, int); // Retrieve next argument
 				uart_sendc(x);
 			}
 
 			else if (*string == 's')
 			{
-				int x = va_arg(ap, int); // Retrieve next argument
+				string++;
+				char *x = va_arg(ap, char *); // Retrieve next argument
 				uart_puts(x);
 			}
 
@@ -66,27 +68,26 @@ void printf(char *string, ...)
 			}
 
 			else if (*string == 'x')
-				y
+			{
+				string++;
+				int x = va_arg(ap, int);
+				int temp_index = MAX_PRINT_SIZE - 1;
+				static char hex_char[] = "0123456789ABCDEF";
+
+				do
 				{
-					string++;
-					int x = va_arg(ap, int);
-					int temp_index = MAX_PRINT_SIZE - 1;
-					static char hex_char[] = "0123456789ABCDEF";
+					temp_buffer[temp_index] = hex_char[x % 16];
+					temp_index--;
+					x /= 16;
+				} while (x != 0);
 
-					do
-					{
-						temp_buffer[temp_index] = hex_char[x % 16];
-						temp_index--;
-						x /= 16;
-					} while (x != 0);
-
-					for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
-					{
-						buffer[buffer_index] = temp_buffer[i];
-						buffer_index++;
-					}
-					uart_puts("0x");
+				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
+				{
+					buffer[buffer_index] = temp_buffer[i];
+					buffer_index++;
 				}
+				uart_puts("0x");
+			}
 
 			else if (*string == '%')
 			{

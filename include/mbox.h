@@ -45,15 +45,19 @@ extern volatile uint32_t mBuf[36];
 
 /* tags */
 #define MBOX_TAG_GETFIRMWARE 0x00000001 // Get firmware revision
-#define MBOX_TAG_GETSERIAL 0x00010004   // Get board serial
 #define MBOX_TAG_GETMODEL 0x00010001    // Get board model
 #define MBOX_TAG_GETREVISION 0x00010002 // Get board revision
 #define MBOX_TAG_GETMACADDR 0x00010003  // Get board MAC address
-#define MBOX_TAG_SETCLKRATE 0x00038002
+#define MBOX_TAG_GETSERIAL 0x00010004   // Get board serial
+#define MBOX_TAG_GETCLKRATE 0x00030002  // Get clock rate
+
+#define MBOX_TAG_SETCLKRATE 0x00038002 // Set clock rate
+#define MBOX_TAG_SETPHYWH 0x00048003   // Set physical (display) width/height
+
 #define MBOX_TAG_LAST 0
 
 /* Function Prototypes */
 int mbox_call(uint32_t buffer_addr, unsigned char channel);
-void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t **res_data, ...);
+void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...);
 
 #endif

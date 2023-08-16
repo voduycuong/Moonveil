@@ -84,6 +84,33 @@ int mbox_call(uint32_t buffer_addr, unsigned char channel)
  * res_data: pointer of pointer, used to get the first address of response data
  * ...: list of parameters for request values (if necessary).
  */
-void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t **res_data, ...)
+void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...)
 {
+    va_list ap;                   // Type to hold information about variable arguments (type)
+    va_start(ap, tag_identifier); // Initialize a variable argument list (macro)
+
+    uint32_t i = 0;
+
+    mBuf[i++] = 0;              // mBuf[0]: will be filled later at the end.
+    mBuf[i++] = MBOX_REQUEST;   // Message Request Code (this is a request message)
+    mBuf[i++] = tag_identifier; // TAG Identifier
+    mBuf[i++] = 8;              // Value buffer size in bytes
+    mBuf[i++] = 0;              // REQUEST CODE = 0
+
+    while (1)
+    {
+        uint32_t x = va_arg(ap, int);
+        if (x == 0)
+            break;
+
+        if (x != 0)
+        {
+            mBuf[i++] = x;
+        }
+    }
+
+    mBuf[i++] = MBOX_TAG_LAST;
+    mBuf[0] = i * 4; // Message Buffer Size in bytes (4 bytes (32 bit) each)
+
+    va_end(ap); // End using variable argument list
 }

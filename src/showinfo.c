@@ -6,16 +6,16 @@ void show_info()
     mBuf[0] = 12 * 4;       // Message Buffer Size in bytes (11 elements * 4 bytes (32 bit) each)
     mBuf[1] = MBOX_REQUEST; // Message Request Code (this is a request message)
 
-    mBuf[2] = MBOX_TAG_GETREVISION; // TAG Identifier: Get board revision
-    mBuf[3] = 4;                    // Value buffer size in bytes (max of request and response lengths)
-    mBuf[4] = 0;                    // REQUEST CODE = 0
-    mBuf[5] = 0;                    // clear output buffer (response data are mBuf[5])
+    mBuf[2] = 0x00010002; // TAG Identifier: Get board revision
+    mBuf[3] = 4;          // Value buffer size in bytes (max of request and response lengths)
+    mBuf[4] = 0;          // REQUEST CODE = 0
+    mBuf[5] = 0;          // clear output buffer (response data are mBuf[5])
 
-    mBuf[6] = MBOX_TAG_GETMACADDR; // TAG Identifier: Get board MAC address
-    mBuf[7] = 6;                   // Value buffer size in bytes (max of request and response lengths)
-    mBuf[8] = 0;                   // REQUEST CODE = 0
-    mBuf[9] = 0;                   // clear output buffer (response data are mBuf[9])
-    mBuf[10] = 0;                  // clear output buffer (response data are mBuf[10])
+    mBuf[6] = 0x00010003; // TAG Identifier: Get board MAC address
+    mBuf[7] = 6;          // Value buffer size in bytes (max of request and response lengths)
+    mBuf[8] = 0;          // REQUEST CODE = 0
+    mBuf[9] = 0;          // clear output buffer (response data are mBuf[9])
+    mBuf[10] = 0;         // clear output buffer (response data are mBuf[10])
 
     mBuf[11] = MBOX_TAG_LAST;
 
@@ -36,7 +36,6 @@ void show_info()
         uart_puts("\n");
 
         uart_puts("Board MAC address: \n\t");
-
         uart_macaddr(mBuf[10], 12);
         uart_sendc(':');
         uart_macaddr(mBuf[9], 28);
