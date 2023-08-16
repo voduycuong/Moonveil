@@ -22,7 +22,7 @@ void main()
 void cli()
 {
 	static char cli_buffer[MAX_CMD_SIZE];
-	static char cmd_history[20][MAX_CMD_SIZE]; // Max history is 20 commands
+	static char cmd_history[MAX_HISTORY_SIZE][MAX_CMD_SIZE]; // Max history is 20 commands
 
 	static int index = 0;
 	static int cmd_index = 0;
@@ -33,7 +33,7 @@ void cli()
 	static int plus_count = 0;
 
 	// Reset command index if exceeded
-	if (cmd_index > 20)
+	if (cmd_index >= MAX_HISTORY_SIZE)
 		cmd_index = 0;
 
 	// Read and send back each char
@@ -47,6 +47,8 @@ void cli()
 		if (underline_count < cmd_history_length)
 		{
 			underline_count++;
+			if (plus_count > 0)
+				plus_count--;
 			cli_buffer[0] = '\0';
 
 			if (cmd_index > 0)
@@ -67,12 +69,13 @@ void cli()
 			}
 		}
 	}
-
 	else if (c == '+')
 	{
 		if (plus_count < cmd_history_length)
 		{
 			plus_count++;
+			if (underline_count > 0)
+				underline_count--;
 			cli_buffer[0] = '\0';
 
 			if (cmd_index < cmd_history_length)
@@ -98,6 +101,7 @@ void cli()
 	// Put into a buffer until got new line character
 	else if (c != '\n')
 	{
+		// STILL TESTING <---------------------------------
 		if (c == '\t')
 		{
 			if (cli_buffer[0] != '\0')
@@ -158,7 +162,6 @@ void cli()
 			show_prompt(color_flag);
 			index = 0;
 		}
-
 		else
 		{
 			if (index != 0)
@@ -202,7 +205,6 @@ void cli()
 				show_help(cli_buffer, cmd_option);
 				cmd_option = 'x';
 			}
-
 			else if (strcmp(cli_buffer, commands[1])) // clear
 				clear_screen();
 
@@ -211,7 +213,6 @@ void cli()
 				set_color(cli_buffer, cmd_option);
 				cmd_option = 'x';
 			}
-
 			else if (strcmp(cli_buffer, commands[3])) // showinfo
 				show_info();
 
@@ -223,15 +224,21 @@ void cli()
 
 			else if (strcmp(cli_buffer, commands[6])) // test
 			{
-				// for (int i = 0; i < 20; i++)
-				// {
-				// 	uart_puts("\n[");
-				// 	uart_dec(i);
-				// 	uart_puts("] = ");
-				// 	uart_puts(cmd_history[i]);
-				// }
+				// int test_hex = 0xFAFB;
+				// uart_puts("\n");
+				// printf("%x\t%d", test_hex, test_hex);
 
-				printf(" %d", cmd_index);
+				// char test_c = 'C';
+				// uart_puts("\n");
+				// printf("%c", test_c);
+
+				// char *test_string = "Cuong";
+				// uart_puts("\n");
+				// printf("%s", test_string);
+
+				float test_float = 0.1234;
+				uart_puts("\n");
+				printf("%f", test_float);
 			}
 
 			// Show error if command not found
@@ -242,7 +249,7 @@ void cli()
 			uart_puts("\n");
 			show_prompt(color_flag);
 
-			// Emply the buffer
+			// Empty the buffer
 			cli_buffer[0] = '\0';
 			index = 0;
 

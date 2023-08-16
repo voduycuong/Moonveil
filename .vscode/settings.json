@@ -10,7 +10,9 @@
         "about.h": "c",
         "mbox.h": "c",
         "printf.h": "c",
-        "gpio.h": "c"
+        "gpio.h": "c",
+        "clear.h": "c",
+        "stddef.h": "c"
     },
     "cmake.configureOnOpen": false
 }

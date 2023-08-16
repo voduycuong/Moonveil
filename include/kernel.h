@@ -17,6 +17,7 @@ extern char *commands[];
 extern char *colors[];
 
 #define MAX_CMD_SIZE 100
+#define MAX_HISTORY_SIZE 5
 
 void cli();
 void show_welcome_screen();
