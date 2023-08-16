@@ -40,8 +40,6 @@ void show_info()
         uart_sendc(':');
         uart_macaddr(mBuf[9], 28);
         uart_puts("\n");
-
-        uart_puts("\n");
     }
     else
     {

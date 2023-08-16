@@ -12,7 +12,8 @@
         "printf.h": "c",
         "gpio.h": "c",
         "clear.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "test.h": "c"
     },
     "cmake.configureOnOpen": false
 }

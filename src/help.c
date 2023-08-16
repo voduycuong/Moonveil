@@ -25,6 +25,9 @@ void show_help(char *buffer, char flag)
         else if (strcmp(subst(buffer, 5), commands[5])) // about command in detail
             exit_info();
 
+        else if (strcmp(subst(buffer, 5), commands[6])) // about command in detail
+            test_info();
+
         else
             show_error(subst(buffer, 5), "is not found. See 'help' to see available commands.");
     }
@@ -39,6 +42,7 @@ void show_help(char *buffer, char flag)
         uart_puts("\tshowinfo\t\t\tShow board revision and board MAC address\n");
         uart_puts("\tabout\t\t\t\tShow credit\n");
         uart_puts("\texit\t\t\t\tExit the terminal\n");
+        uart_puts("\ttest\t\t\t\tTest case for question 2 and 3\n");
         uart_puts("\n");
         uart_puts("\tHint: Use '_' and '+' to go through command history list.\n");
     }

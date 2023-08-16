@@ -224,7 +224,11 @@ void cli()
 
 			else if (strcmp(cli_buffer, commands[6])) // test
 			{
-				// test("test_printf");
+				uart_puts("\n-----------------------------------------------");
+				uart_puts("\nTesting printf command: ");
+				test("test_printf");
+				uart_puts("\n-----------------------------------------------");
+				uart_puts("\nTesting mailbox setup: ");
 				test("test_mailbox");
 			}
 
