@@ -100,11 +100,11 @@ void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...)
     while (1)
     {
         uint32_t x = va_arg(ap, int);
-        if (x == 0)
-            break;
-
         if (x != 0)
             mBuf[i++] = x;
+
+        else
+            break;
     }
 
     mBuf[i++] = MBOX_TAG_LAST;

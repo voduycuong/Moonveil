@@ -13,7 +13,11 @@
         "gpio.h": "c",
         "clear.h": "c",
         "stddef.h": "c",
-        "test.h": "c"
+        "test.h": "c",
+        "atomic": "c",
+        "cstdint": "c",
+        "*.tcc": "c",
+        "random": "c"
     },
     "cmake.configureOnOpen": false
 }

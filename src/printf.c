@@ -18,8 +18,12 @@ void printf(char *string, ...)
 
 	while (1)
 	{
+
 		if (*string == 0)
+		{
+			buffer[buffer_index] = '\0';
 			break;
+		}
 
 		if (*string == '%')
 		{
@@ -47,24 +51,20 @@ void printf(char *string, ...)
 
 			else if (*string == 'c')
 			{
-				string++;
 				int x = va_arg(ap, int); // Retrieve next argument
 				uart_sendc(x);
 			}
 
 			else if (*string == 's')
 			{
-				string++;
 				char *x = va_arg(ap, char *); // Retrieve next argument
 				uart_puts(x);
 			}
 
 			else if (*string == 'f')
 			{
-				// string++;
-				// int x = va_arg(ap, int); // Retrieve next argument
-				// uart_puts(x);
-				// int temp_index = MAX_PRINT_SIZE - 1;
+				double x = va_arg(ap, double); // Retrieve next argument
+				uart_dec(x);
 			}
 
 			else if (*string == 'x')
@@ -86,7 +86,6 @@ void printf(char *string, ...)
 					buffer[buffer_index] = temp_buffer[i];
 					buffer_index++;
 				}
-				uart_puts("0x");
 			}
 
 			else if (*string == '%')
@@ -94,9 +93,18 @@ void printf(char *string, ...)
 				uart_sendc('%');
 			}
 		}
+
 		else
 		{
 			buffer[buffer_index] = *string;
+
+			// uart_puts("\n***** STRING: ");
+			// uart_puts(string);
+			// uart_puts("\n-> BUFFER ");
+			// uart_dec(buffer_index);
+			// uart_puts("\t");
+			// uart_sendc(buffer[buffer_index]);
+
 			buffer_index++;
 			string++;
 		}
@@ -107,6 +115,6 @@ void printf(char *string, ...)
 
 	va_end(ap); // End using variable argument list
 
-	// Print out formated string
+	// Print out the buffer
 	uart_puts(buffer);
 }

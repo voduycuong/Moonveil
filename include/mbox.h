@@ -50,6 +50,8 @@ extern volatile uint32_t mBuf[36];
 #define MBOX_TAG_GETMACADDR 0x00010003  // Get board MAC address
 #define MBOX_TAG_GETSERIAL 0x00010004   // Get board serial
 #define MBOX_TAG_GETCLKRATE 0x00030002  // Get clock rate
+#define MBOX_TAG_GETVOLT 0x00030003     // Get voltage
+#define MBOX_TAG_GETPHYWH 0x00040003    // Get physical (display) width/height
 
 #define MBOX_TAG_SETCLKRATE 0x00038002 // Set clock rate
 #define MBOX_TAG_SETPHYWH 0x00048003   // Set physical (display) width/height
