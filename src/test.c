@@ -5,33 +5,27 @@ void test(char *test_case)
     if (strcmp(test_case, "test_printf"))
     {
         int d = 100000;
-        uart_puts("\n-- Test case 1: \%d format\n");
-        printf("%d", d);
-        uart_puts("\n");
+        printf("\n-- Test case 1: decimal format\n");
+        printf("%d\n", d);
 
         int h = 0xFAFB;
-        uart_puts("\n-- Test case 2: \%x format\n");
-        printf("0x%x", h);
-        uart_puts("\n");
+        printf("\n-- Test case 2: hexa format\n");
+        printf("0x%x\n", h);
 
-        char c = 'C';
-        uart_puts("\n-- Test case 3: \%c format\n");
-        printf("%c", c);
-        uart_puts("\n");
+        char ch = 'G';
+        printf("\n-- Test case 3: char format\n");
+        printf("%c\n", ch);
 
         char *string = "MOONVEIL";
-        uart_puts("\n-- Test case 4: \%s format\n");
-        printf("%s", string);
-        uart_puts("\n");
+        printf("\n-- Test case 4: string format\n");
+        printf("%s\n", string);
 
         float f = 0.123456;
-        uart_puts("\n-- Test case 5: \%f format\n");
-        printf("%f", f);
-        uart_puts("\n");
+        printf("\n-- Test case 5: float format\n");
+        printf("%f\n", f);
 
-        uart_puts("\n-- Test case 6: \%\% format\n");
-        printf("%%");
-        uart_puts("\n");
+        printf("\n-- Test case 6: %% format\n");
+        printf("%%\n");
     }
 
     else if (strcmp(test_case, "test_mailbox"))
@@ -39,10 +33,9 @@ void test(char *test_case)
         printf("\n-- Test case 1: Get board revision");
         mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETREVISION);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
-        printf("DATA: Board revision = 0x%x", mBuf[5]);
-        printf("\n");
+        printf("DATA: Board revision = 0x%x\n", mBuf[5]);
 
-        uart_puts("\n-- Test case 2: Get board MAC address");
+        printf("\n-- Test case 2: Get board MAC address");
         mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETMACADDR);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         uart_puts("DATA: Board MAC address: ");
@@ -55,29 +48,25 @@ void test(char *test_case)
         mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETCLKRATE, 3);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("DATA: Clock ID = %d", mBuf[5]);
-        printf("\nDATA: ARM clock rate = %d", mBuf[6]);
-        printf("\n");
+        printf("\nDATA: ARM clock rate = %d\n", mBuf[6]);
 
-        uart_puts("\n-- Test case 4: Get physical width/height");
+        printf("\n-- Test case 4: Get physical width/height");
         mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETPHYWH);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("DATA: Width (in px) = %d", mBuf[5]);
-        printf("\nDATA: Height (in px) = %d", mBuf[6]);
-        uart_puts("\n");
+        printf("\nDATA: Height (in px) = %d\n", mBuf[6]);
 
-        uart_puts("\n-- Test case 5: Set physical width/height");
+        printf("\n-- Test case 5: Set physical width/height");
         mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_SETPHYWH, 1024, 768);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("DATA: Actual Physical Width = %d", mBuf[5]);
-        printf("\nDATA: Actual Physical Height = %d", mBuf[6]);
-        uart_puts("\n");
+        printf("\nDATA: Actual Physical Height = %d\n", mBuf[6]);
 
-        uart_puts("\n-- Test case 6: Get voltage");
+        printf("\n-- Test case 6: Get voltage");
         mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETVOLT, 1);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("DATA: Volt ID = %d", mBuf[5]);
-        printf("\nDATA: Voltage = %d", mBuf[6]);
-        uart_puts("\n");
+        printf("\nDATA: Voltage = %x\n", mBuf[6]);
     }
 }
 

@@ -18,17 +18,15 @@ void printf(char *string, ...)
 
 	while (1)
 	{
-
 		if (*string == 0)
 		{
-			buffer[buffer_index] = '\0';
+			buffer[buffer_index] = '\0'; // Enclose the buffer
 			break;
 		}
 
 		if (*string == '%')
 		{
 			string++;
-
 			if (*string == 'd')
 			{
 				string++;
@@ -51,20 +49,28 @@ void printf(char *string, ...)
 
 			else if (*string == 'c')
 			{
+				string++;
 				int x = va_arg(ap, int); // Retrieve next argument
-				uart_sendc(x);
+				buffer[buffer_index] = x;
+				buffer_index++;
 			}
 
 			else if (*string == 's')
 			{
+				string++;
 				char *x = va_arg(ap, char *); // Retrieve next argument
-				uart_puts(x);
+				for (int i = 0; i < strlen(x); i++)
+				{
+					buffer[buffer_index] = x[i];
+					buffer_index++;
+				}
 			}
 
 			else if (*string == 'f')
 			{
 				double x = va_arg(ap, double); // Retrieve next argument
-				uart_dec(x);
+				buffer[buffer_index] = x;
+				buffer_index++;
 			}
 
 			else if (*string == 'x')
@@ -97,14 +103,6 @@ void printf(char *string, ...)
 		else
 		{
 			buffer[buffer_index] = *string;
-
-			// uart_puts("\n***** STRING: ");
-			// uart_puts(string);
-			// uart_puts("\n-> BUFFER ");
-			// uart_dec(buffer_index);
-			// uart_puts("\t");
-			// uart_sendc(buffer[buffer_index]);
-
 			buffer_index++;
 			string++;
 		}

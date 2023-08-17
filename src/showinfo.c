@@ -17,8 +17,6 @@ void show_info()
     mBuf[9] = 0;          // clear output buffer (response data are mBuf[9])
     mBuf[10] = 0;         // clear output buffer (response data are mBuf[10])
 
-    mBuf[11] = MBOX_TAG_LAST;
-
     if (mbox_call(ADDR(mBuf), MBOX_CH_PROP))
     {
         uart_puts("Response Code for whole message: ");

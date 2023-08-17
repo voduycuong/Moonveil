@@ -230,9 +230,9 @@ void cli()
 
 				uart_puts("\n");
 
-				uart_puts("\nTesting mailbox setup: ");
-				uart_puts("\n-----------------------------------------------");
-				test("test_mailbox");
+				// uart_puts("\nTesting mailbox setup: ");
+				// uart_puts("\n-----------------------------------------------");
+				// test("test_mailbox");
 			}
 
 			// Show error if command not found

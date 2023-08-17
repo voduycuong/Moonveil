@@ -3,6 +3,7 @@
 
 #include "uart.h"
 #include "mbox.h"
+#include "printf.h"
 
 void show_info();
 void show_info_info();

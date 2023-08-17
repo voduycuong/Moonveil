@@ -5,6 +5,7 @@
 #include "./gcclib/stdint.h"
 #include "./gcclib/stdarg.h"
 #include "uart.h"
+#include "string.h"
 
 void printf(char *string, ...);
 
