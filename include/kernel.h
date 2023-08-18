@@ -4,7 +4,6 @@
 #include "mbox.h"
 #include "uart.h"
 #include "string.h"
-
 #include "help.h"
 #include "clear.h"
 #include "setcolor.h"
@@ -23,5 +22,7 @@ void cli();
 void show_welcome_screen();
 void show_prompt(int flag);
 void show_error(char *cmd, char *error_message);
+void clear_cmd(char *command);
+void feed(char *command, char *buffer);
 
 #endif

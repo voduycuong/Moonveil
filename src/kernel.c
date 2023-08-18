@@ -2,15 +2,13 @@
 
 char *commands[] = {"help", "clear", "setcolor", "showinfo", "about", "test"};
 char *colors[] = {"black", "red", "green", "yellow", "blue", "purple", "cyan", "white"};
-int color_flag = 0;
+int color_flag = 0; // Flag for using the default color of prompt
 
 void main()
 {
-	// Set up serial console
-	uart_init();
-
-	clear_screen();
-	show_welcome_screen();
+	uart_init();		   // Set up serial console
+	clear_screen();		   // Clear screen
+	show_welcome_screen(); // Show welcome screen
 
 	// Run CLI
 	while (1)
@@ -21,18 +19,18 @@ void main()
 
 void cli()
 {
-	static char cli_buffer[MAX_CMD_SIZE];
-	static char cmd_history[MAX_HISTORY_SIZE][MAX_CMD_SIZE]; // Max history is 20 commands
+	static char cli_buffer[MAX_CMD_SIZE];					 // CLI BUFFER
+	static char cmd_history[MAX_HISTORY_SIZE][MAX_CMD_SIZE]; // COMMAND HISTORY
 
-	static int index = 0;	  // For indexing elements in cli_buffer
-	static int cmd_index = 0; // For indexing commands in history
+	static int index = 0;	  // Indexing elements in cli_buffer
+	static int cmd_index = 0; // Indexing commands in history
 
 	static int cmd_history_length = 0; // Count history size
 	static int underline_count = 0;	   // Count underline key
 	static int plus_count = 0;		   // Count plus key
 
 	static char cmd_option = 'x'; // Command option flag
-	static int spec_pressed = 0;  // Special key: '_', '+', '\\t' flag
+	static int spec_pressed = 0;  // Special key ('_', '+', '\\t') flag
 
 	char c = uart_getc(); // Read and send back each char
 
@@ -48,21 +46,10 @@ void cli()
 			if (plus_count > 0)
 				plus_count--;
 
-			cmd_index--; // Go back to previous command
-
-			// Load command from history into current buffer
-			for (int i = 0; i < strlen(cmd_history[cmd_index]); i++)
-			{
-				cli_buffer[i] = cmd_history[cmd_index][i];
-				cli_buffer[i + 1] = '\0';
-			}
-
-			// Clear previous command shown on terminal
-			for (int i = 0; i < strlen(cmd_history[cmd_index + 1]); i++)
-				uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
-			uart_puts("\033[0K");	  // Clear line from cursor right
-
-			uart_puts(cli_buffer); // Show buffer
+			cmd_index--;							  // Back to previous command
+			feed(cmd_history[cmd_index], cli_buffer); // Load command from history into current buffer
+			clear_cmd(cmd_history[cmd_index + 1]);	  // Clear previous command shown on terminal
+			uart_puts(cli_buffer);					  // Show command
 		}
 	}
 
@@ -78,21 +65,10 @@ void cli()
 			if (underline_count > 0)
 				underline_count--;
 
-			cmd_index++; // Go to next command
-
-			// Load command from history into current buffer
-			for (int i = 0; i < strlen(cmd_history[cmd_index]); i++)
-			{
-				cli_buffer[i] = cmd_history[cmd_index][i];
-				cli_buffer[i + 1] = '\0';
-			}
-
-			// Clear previous command shown on terminal
-			for (int i = 0; i < strlen(cmd_history[cmd_index - 1]); i++)
-				uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
-			uart_puts("\033[0K");	  // Clear line from cursor right
-
-			uart_puts(cli_buffer); // Show buffer
+			cmd_index++;							  // Next command
+			feed(cmd_history[cmd_index], cli_buffer); // Load command from history into current buffer
+			clear_cmd(cmd_history[cmd_index - 1]);	  // Clear previous command shown on terminal
+			uart_puts(cli_buffer);					  // Show command
 		}
 	}
 
@@ -100,7 +76,6 @@ void cli()
 	else if (c == '\t')
 	{
 		spec_pressed = 1;
-
 		int found_index = 0; // Indexing the found command
 		for (int i = 0; i < 5; i++)
 			if (strsearch(commands[i], cli_buffer))
@@ -109,19 +84,9 @@ void cli()
 				break;
 			}
 
-		// Clear previous command shown on terminal
-		for (int i = 0; i < strlen(cli_buffer); i++)
-			uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
-		uart_puts("\033[0K");	  // Clear line from cursor right
-
-		// Load found command into current buffer
-		for (int i = 0; i < strlen(commands[found_index]); i++)
-		{
-			cli_buffer[i] = commands[found_index][i];
-			cli_buffer[i + 1] = '\0';
-		}
-
-		uart_puts(cli_buffer); // Show buffer
+		clear_cmd(cli_buffer);					 // Clear previous command shown on terminal
+		feed(commands[found_index], cli_buffer); // Load found command into current buffer
+		uart_puts(cli_buffer);					 // Show buffer
 	}
 
 	// Put into a buffer until got new line character
@@ -139,16 +104,13 @@ void cli()
 		else if (c == '\b')
 		{
 			if (spec_pressed)
-				index = strlen(cli_buffer);
+				index = strlen(cli_buffer); // Get index if buffer is not from manual typing
 			index--;
 
 			if (index >= 0)
 			{
-				// Clear 1 char in buffer
-				cli_buffer[index] = '\0';
-
-				// Clear 1 char in terminal
-				uart_puts("\033[1D\033[0K"); // Move cursor left 1 step & Clear line from cursor left
+				cli_buffer[index] = '\0';	 // Clear 1 char in buffer
+				uart_puts("\033[1D\033[0K"); // Clear 1 char in terminal (Move cursor left 1 step & Clear line from cursor left)
 			}
 
 			// Restart index if buffer is empty
@@ -160,7 +122,6 @@ void cli()
 	// Return key is pressed
 	else if (c == '\n')
 	{
-
 		// Check if none command
 		if (cli_buffer[0] == '\0')
 		{
@@ -171,16 +132,8 @@ void cli()
 		}
 		else
 		{
-			if (spec_pressed)
-				cmd_index = cmd_history_length; // Back to top
-
-			// Save current buffer
-			for (int i = 0; i < strlen(cli_buffer); i++)
-			{
-				cmd_history[cmd_index][i] = cli_buffer[i];
-				cmd_history[cmd_index][i + 1] = '\0';
-			}
-
+			cmd_index = cmd_history_length;			  // Continue indexing
+			feed(cli_buffer, cmd_history[cmd_index]); // Save current buffer
 			cmd_index++;
 			cmd_history_length++;
 
@@ -207,51 +160,43 @@ void cli()
 				if (strcmp(temp, commands[2]))
 				{
 					color_flag = 1;	  // Color flag on to bypass default prompt color
-					cmd_option = 's'; // Turn on 'help' with parameter flag
+					cmd_option = 's'; // Turn on 'setcolor' with parameter flag
 				}
 			}
 			// Clear temp
 			temp[0] = '\0';
 
 			// Check buffer with available commands
-			if (strcmp(cli_buffer, commands[0]) || cmd_option == 'h') // help
+			if (strcmp(cli_buffer, commands[0]) || cmd_option == 'h') // help command
 			{
 				show_help(cli_buffer, cmd_option);
-				cmd_option = 'x';
+				cmd_option = 'x'; // Reset option flag
 			}
-			else if (strcmp(cli_buffer, commands[1])) // clear
+			else if (strcmp(cli_buffer, commands[1])) // clear command
 				clear_screen();
 
-			else if (strcmp(cli_buffer, commands[2]) || cmd_option == 's') // setcolor
+			else if (strcmp(cli_buffer, commands[2]) || cmd_option == 's') // setcolor command
 			{
 				set_color(cli_buffer, cmd_option);
-				cmd_option = 'x';
+				cmd_option = 'x'; // Reset option flag
 			}
-			else if (strcmp(cli_buffer, commands[3])) // showinfo
+			else if (strcmp(cli_buffer, commands[3])) // showinfo command
 				show_info();
 
-			else if (strcmp(cli_buffer, commands[4])) // about
+			else if (strcmp(cli_buffer, commands[4])) // about command
 				show_about();
 
-			else if (strcmp(cli_buffer, commands[5])) // test
+			else if (strcmp(cli_buffer, commands[5])) // test command
 			{
-				// uart_puts("\nTesting printf command: ");
-				// uart_puts("\n-----------------------------------------------");
-				// test("test_printf");
+				uart_puts("\nTesting printf command: ");
+				uart_puts("\n-----------------------------------------------");
+				test("test_printf");
 
-				// uart_puts("\n");
+				uart_puts("\n");
 
-				// uart_puts("\nTesting mailbox setup: ");
-				// uart_puts("\n-----------------------------------------------");
-				// test("test_mailbox");
-
-				for (int i = 0; i <= cmd_history_length; i++)
-				{
-					uart_puts("\n[");
-					uart_dec(i);
-					uart_puts("] = ");
-					uart_puts(cmd_history[i]);
-				}
+				uart_puts("\nTesting mailbox setup: ");
+				uart_puts("\n-----------------------------------------------");
+				test("test_mailbox");
 			}
 
 			// Show error if command not found
@@ -269,12 +214,12 @@ void cli()
 
 			underline_count = 0; // Reset the count for command history
 			plus_count = 0;		 // Reset the count for command history
-			spec_pressed = 0;
+			spec_pressed = 0;	 // Reset special key flag
 		}
 	}
 }
 
-// Function for showing a welcome screen when OS boot up
+// Show welcome screen when OS boot up
 void show_welcome_screen()
 {
 	show_about(); // Welcome screen
@@ -283,7 +228,7 @@ void show_welcome_screen()
 	show_prompt(0);
 }
 
-// Function for showing prompt at the beginning of each command
+// Show prompt at the beginning of each command
 void show_prompt(int flag)
 {
 	if (flag == 0)
@@ -296,7 +241,7 @@ void show_prompt(int flag)
 		uart_puts("Moonveil> ");
 }
 
-// Function for output an error message
+// Output an error message
 void show_error(char *cmd, char *error_message)
 {
 	uart_puts("\nError: '");
@@ -304,4 +249,22 @@ void show_error(char *cmd, char *error_message)
 	uart_puts("' ");
 	uart_puts(error_message);
 	uart_puts("\n");
+}
+
+// Clear a command on terminal
+void clear_cmd(char *command)
+{
+	for (int i = 0; i < strlen(command); i++)
+		uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+	uart_puts("\033[0K");	  // Clear line from cursor right
+}
+
+// Feeding into buffer
+void feed(char *command, char *buffer)
+{
+	for (int i = 0; i < strlen(command); i++)
+	{
+		buffer[i] = command[i];
+		buffer[i + 1] = '\0';
+	}
 }
