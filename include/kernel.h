@@ -11,14 +11,13 @@
 #include "showinfo.h"
 #include "printf.h"
 #include "about.h"
-#include "exit.h"
 #include "test.h"
 
 extern char *commands[];
 extern char *colors[];
 
 #define MAX_CMD_SIZE 100
-#define MAX_HISTORY_SIZE 5
+#define MAX_HISTORY_SIZE 30
 
 void cli();
 void show_welcome_screen();

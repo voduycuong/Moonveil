@@ -81,7 +81,6 @@ int mbox_call(uint32_t buffer_addr, unsigned char channel)
  * Make a mailbox setup
  * buffer_addr: address of the being used mailbox buffer
  * tag_identifier: TAG indentifier value
- * res_data: pointer of pointer, used to get the first address of response data
  * ...: list of parameters for request values (if necessary).
  */
 void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...)
@@ -99,7 +98,7 @@ void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...)
 
     while (1)
     {
-        uint32_t x = va_arg(ap, int);
+        int x = va_arg(ap, int);
         if (x != 0)
             mBuf[i++] = x;
 

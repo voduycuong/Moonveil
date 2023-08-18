@@ -23,9 +23,6 @@ void show_help(char *buffer, char flag)
             show_about_info();
 
         else if (strcmp(subst(buffer, 5), commands[5])) // about command in detail
-            exit_info();
-
-        else if (strcmp(subst(buffer, 5), commands[6])) // about command in detail
             test_info();
 
         else
