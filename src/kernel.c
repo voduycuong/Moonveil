@@ -24,35 +24,29 @@ void cli()
 	static char cli_buffer[MAX_CMD_SIZE];
 	static char cmd_history[MAX_HISTORY_SIZE][MAX_CMD_SIZE]; // Max history is 20 commands
 
-	static int index = 0;
-	static int cmd_index = 0;
-	static int cmd_history_length = 0;
+	static int index = 0;	  // For indexing elements in cli_buffer
+	static int cmd_index = 0; // For indexing commands in history
 
-	static char cmd_option = 'x';
-	static int underline_count = 0;
-	static int plus_count = 0;
+	static int cmd_history_length = 0; // Count history size
+	static int underline_count = 0;	   // Count underline key
+	static int plus_count = 0;		   // Count plus key
 
-	// Read and send back each char
-	char c = uart_getc();
+	static char cmd_option = 'x'; // Command option flag
+	static int spec_pressed = 0;  // Special key: '_', '+', '\\t' flag
 
-	// while (cmd_history[cmd_history_length][0] != '\0')
+	char c = uart_getc(); // Read and send back each char
 
+	// '_' key is pressed
 	if (c == '_')
 	{
-
-		if (cmd_index > 0)
+		spec_pressed = 1;
+		if (cmd_index > 0) // Reach the start of history
 		{
 			underline_count++;
+
+			// Check if '+' is pressed, then eliminate
 			if (plus_count > 0)
 				plus_count--;
-
-			uart_puts("\nCMD_HISTORY_LENGTH = ");
-			uart_dec(cmd_history_length);
-			uart_puts("\nUNDERLINE_COUNT = ");
-			uart_dec(underline_count);
-			uart_puts("\nPLUS_COUNT = ");
-			uart_dec(plus_count);
-			uart_puts("\n");
 
 			cmd_index--; // Go back to previous command
 
@@ -62,28 +56,27 @@ void cli()
 				cli_buffer[i] = cmd_history[cmd_index][i];
 				cli_buffer[i + 1] = '\0';
 			}
+
+			// Clear previous command shown on terminal
 			for (int i = 0; i < strlen(cmd_history[cmd_index + 1]); i++)
 				uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
+			uart_puts("\033[0K");	  // Clear line from cursor right
 
-			uart_puts("\033[0K");  // Clear line from cursor right
 			uart_puts(cli_buffer); // Show buffer
 		}
 	}
+
+	// '+' key is pressed
 	else if (c == '+')
 	{
-		if (cmd_index < cmd_history_length - 1)
+		spec_pressed = 1;
+		if (cmd_index < cmd_history_length - 1) // Reach the end of history
 		{
 			plus_count++;
+
+			// Check if '-' is pressed, then eliminate
 			if (underline_count > 0)
 				underline_count--;
-
-			uart_puts("\nCMD_HISTORY_LENGTH = ");
-			uart_dec(cmd_history_length);
-			uart_puts("\nUNDERLINE_COUNT = ");
-			uart_dec(underline_count);
-			uart_puts("\nPLUS_COUNT = ");
-			uart_dec(plus_count);
-			uart_puts("\n");
 
 			cmd_index++; // Go to next command
 
@@ -94,6 +87,7 @@ void cli()
 				cli_buffer[i + 1] = '\0';
 			}
 
+			// Clear previous command shown on terminal
 			for (int i = 0; i < strlen(cmd_history[cmd_index - 1]); i++)
 				uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
 			uart_puts("\033[0K");	  // Clear line from cursor right
@@ -102,9 +96,12 @@ void cli()
 		}
 	}
 
+	// Tab key is pressed
 	else if (c == '\t')
 	{
-		int found_index = 0;
+		spec_pressed = 1;
+
+		int found_index = 0; // Indexing the found command
 		for (int i = 0; i < 5; i++)
 			if (strsearch(commands[i], cli_buffer))
 			{
@@ -112,6 +109,7 @@ void cli()
 				break;
 			}
 
+		// Clear previous command shown on terminal
 		for (int i = 0; i < strlen(cli_buffer); i++)
 			uart_puts("\033[1D"); // Cursor to the left n times equal to the length of the buffer
 		uart_puts("\033[0K");	  // Clear line from cursor right
@@ -123,7 +121,7 @@ void cli()
 			cli_buffer[i + 1] = '\0';
 		}
 
-		uart_puts(cli_buffer);
+		uart_puts(cli_buffer); // Show buffer
 	}
 
 	// Put into a buffer until got new line character
@@ -140,13 +138,16 @@ void cli()
 		// If backspaced, clear in buffer + clear on terminal
 		else if (c == '\b')
 		{
+			if (spec_pressed)
+				index = strlen(cli_buffer);
 			index--;
+
 			if (index >= 0)
 			{
 				// Clear 1 char in buffer
 				cli_buffer[index] = '\0';
 
-				// Clear in terminal
+				// Clear 1 char in terminal
 				uart_puts("\033[1D\033[0K"); // Move cursor left 1 step & Clear line from cursor left
 			}
 
@@ -156,7 +157,7 @@ void cli()
 		}
 	}
 
-	// User input 'return'
+	// Return key is pressed
 	else if (c == '\n')
 	{
 
@@ -170,8 +171,8 @@ void cli()
 		}
 		else
 		{
-			if (plus_count != 0 || underline_count != 0)
-				cmd_index = underline_count + plus_count; // Back to top
+			if (spec_pressed)
+				cmd_index = cmd_history_length; // Back to top
 
 			// Save current buffer
 			for (int i = 0; i < strlen(cli_buffer); i++)
@@ -268,6 +269,7 @@ void cli()
 
 			underline_count = 0; // Reset the count for command history
 			plus_count = 0;		 // Reset the count for command history
+			spec_pressed = 0;
 		}
 	}
 }
