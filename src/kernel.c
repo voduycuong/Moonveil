@@ -31,25 +31,28 @@ void cli()
 	static char cmd_option = 'x';
 	static int underline_count = 0;
 	static int plus_count = 0;
-	static int cmd_element = 0;
 
 	// Read and send back each char
 	char c = uart_getc();
 
-	while (cmd_history[cmd_history_length][0] != '\0')
-		cmd_history_length++;
-
-	// uart_puts("\nCURRENT INDEX = ");
-	// uart_dec(cmd_index);
-	// uart_puts("\n");
+	// while (cmd_history[cmd_history_length][0] != '\0')
 
 	if (c == '_')
 	{
-		if (underline_count < cmd_history_length)
+
+		if (cmd_index > 0)
 		{
 			underline_count++;
 			if (plus_count > 0)
 				plus_count--;
+
+			uart_puts("\nCMD_HISTORY_LENGTH = ");
+			uart_dec(cmd_history_length);
+			uart_puts("\nUNDERLINE_COUNT = ");
+			uart_dec(underline_count);
+			uart_puts("\nPLUS_COUNT = ");
+			uart_dec(plus_count);
+			uart_puts("\n");
 
 			cmd_index--; // Go back to previous command
 
@@ -68,11 +71,19 @@ void cli()
 	}
 	else if (c == '+')
 	{
-		if (plus_count - underline_count < cmd_index - 1 && plus_count < cmd_history_length)
+		if (cmd_index < cmd_history_length - 1)
 		{
 			plus_count++;
 			if (underline_count > 0)
 				underline_count--;
+
+			uart_puts("\nCMD_HISTORY_LENGTH = ");
+			uart_dec(cmd_history_length);
+			uart_puts("\nUNDERLINE_COUNT = ");
+			uart_dec(underline_count);
+			uart_puts("\nPLUS_COUNT = ");
+			uart_dec(plus_count);
+			uart_puts("\n");
 
 			cmd_index++; // Go to next command
 
@@ -163,11 +174,14 @@ void cli()
 				cmd_index = underline_count + plus_count; // Back to top
 
 			// Save current buffer
-			for (cmd_element = 0; cmd_element < strlen(cli_buffer); cmd_element++)
-				cmd_history[cmd_index][cmd_element] = cli_buffer[cmd_element];
+			for (int i = 0; i < strlen(cli_buffer); i++)
+			{
+				cmd_history[cmd_index][i] = cli_buffer[i];
+				cmd_history[cmd_index][i + 1] = '\0';
+			}
 
-			cmd_history[cmd_index][cmd_element] = '\0';
 			cmd_index++;
+			cmd_history_length++;
 
 			// Reset command index if exceeded
 			if (cmd_index >= MAX_HISTORY_SIZE)
