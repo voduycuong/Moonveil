@@ -98,7 +98,7 @@ void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...)
 
     while (1)
     {
-        int x = va_arg(ap, int);
+        int x = va_arg(ap, int); // Get next argument
         if (x != 0)
             mBuf[i++] = x;
 

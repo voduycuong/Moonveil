@@ -110,7 +110,8 @@ void cli()
 			if (index >= 0)
 			{
 				cli_buffer[index] = '\0';	 // Clear 1 char in buffer
-				uart_puts("\033[1D\033[0K"); // Clear 1 char in terminal (Move cursor left 1 step & Clear line from cursor left)
+				uart_puts("\033[1D\033[0K"); // Clear 1 char in terminal
+											 // (Move cursor left 1 step & Clear line from cursor left)
 			}
 
 			// Restart index if buffer is empty
@@ -188,15 +189,18 @@ void cli()
 
 			else if (strcmp(cli_buffer, commands[5])) // test command
 			{
-				uart_puts("\nTesting printf command: ");
-				uart_puts("\n-----------------------------------------------");
-				test("test_printf");
+				// uart_puts("\nTesting printf command: ");
+				// uart_puts("\n-----------------------------------------------");
+				// test("test_printf");
+
+				// uart_puts("\n");
+
+				// uart_puts("\nTesting mailbox setup: ");
+				// uart_puts("\n-----------------------------------------------");
+				// test("test_mailbox");
 
 				uart_puts("\n");
-
-				uart_puts("\nTesting mailbox setup: ");
-				uart_puts("\n-----------------------------------------------");
-				test("test_mailbox");
+				printf("%05d", 6);
 			}
 
 			// Show error if command not found

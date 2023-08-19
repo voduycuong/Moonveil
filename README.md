@@ -21,6 +21,7 @@
     <li>setcolor</li>
     <li>showinfo</li>
     <li>about</li>
+    <li>test</li>
 </ol>
 
 ##### References 

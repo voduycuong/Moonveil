@@ -33,15 +33,14 @@ void show_help(char *buffer, char flag)
     {
         uart_puts("\n");
         uart_puts("\thelp\t\t\t\tShow brief information of all commands\n");
-        uart_puts("\thelp <command_name>\t\tShow full information of all commands\n");
+        uart_puts("\thelp <command_name>\t\tShow full information of command\n");
         uart_puts("\tclear\t\t\t\tClear screen\n");
         uart_puts("\tsetcolor\t\t\tSet text/background color of the console\n");
         uart_puts("\tshowinfo\t\t\tShow board revision and board MAC address\n");
         uart_puts("\tabout\t\t\t\tShow credit\n");
-        uart_puts("\texit\t\t\t\tExit the terminal\n");
         uart_puts("\ttest\t\t\t\tTest case for question 2 and 3\n");
         uart_puts("\n");
-        uart_puts("\tHint: Use '_' and '+' to go through command history list.\n");
+        uart_puts("\tHint: Use '_' and '+' for browsing command history.\n");
     }
 }
 

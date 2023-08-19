@@ -13,6 +13,8 @@ void printf(char *string, ...)
 
 	char buffer[MAX_PRINT_SIZE];
 	int buffer_index = 0;
+	int width = 0;
+	int zero_flag = 0;
 
 	char temp_buffer[MAX_PRINT_SIZE];
 
@@ -27,6 +29,30 @@ void printf(char *string, ...)
 		if (*string == '%')
 		{
 			string++;
+
+			// Check if 0 flag is on and check for the next character
+			if (*string == '0')
+			{
+				zero_flag = 1;
+				string++;
+			}
+
+			// Counting width
+			while (*string >= '1' && *string <= '9')
+			{
+				width = width * 10 + (*string - '0');
+				string++;
+			}
+
+			// Print out whether '0' or ' '
+			for (buffer_index = 0; buffer_index < width - 1; buffer_index++)
+			{
+				if (zero_flag)
+					buffer[buffer_index] = '0';
+				else
+					buffer[buffer_index] = ' ';
+			}
+
 			if (*string == 'd')
 			{
 				string++;

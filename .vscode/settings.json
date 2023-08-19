@@ -17,7 +17,8 @@
         "atomic": "c",
         "cstdint": "c",
         "*.tcc": "c",
-        "random": "c"
+        "random": "c",
+        "stdint.h": "c"
     },
     "cmake.configureOnOpen": false
 }

@@ -136,7 +136,7 @@ void uart_hex(unsigned int num)
 }
 
 /**
- * Display a value in hexadecimal
+ * Display a MAC value in hexadecimal
  */
 void uart_macaddr(unsigned int num, unsigned int pos)
 {
