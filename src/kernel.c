@@ -30,14 +30,12 @@ void cli()
 	static int plus_count = 0;		   // Count plus key
 
 	static char cmd_option = 'x'; // Command option flag
-	static int spec_pressed = 0;  // Special key ('_', '+', '\\t') flag
 
-	char c = uart_getc(); // Read and send back each char
+	char input = uart_getc(); // Read and send back each char
 
 	// '_' key is pressed
-	if (c == '_')
+	if (input == '_')
 	{
-		spec_pressed = 1;
 		if (cmd_index > 0) // Reach the start of history
 		{
 			underline_count++;
@@ -50,13 +48,13 @@ void cli()
 			feed(cmd_history[cmd_index], cli_buffer); // Load command from history into current buffer
 			clear_cmd(cmd_history[cmd_index + 1]);	  // Clear previous command shown on terminal
 			uart_puts(cli_buffer);					  // Show command
+			index = strlen(cli_buffer);				  // Update index
 		}
 	}
 
 	// '+' key is pressed
-	else if (c == '+')
+	else if (input == '+')
 	{
-		spec_pressed = 1;
 		if (cmd_index < cmd_history_length - 1) // Reach the end of history
 		{
 			plus_count++;
@@ -69,13 +67,13 @@ void cli()
 			feed(cmd_history[cmd_index], cli_buffer); // Load command from history into current buffer
 			clear_cmd(cmd_history[cmd_index - 1]);	  // Clear previous command shown on terminal
 			uart_puts(cli_buffer);					  // Show command
+			index = strlen(cli_buffer);				  // Update index
 		}
 	}
 
 	// Tab key is pressed
-	else if (c == '\t')
+	else if (input == '\t')
 	{
-		spec_pressed = 1;
 		int found_index = 0; // Indexing the found command
 		for (int i = 0; i < 5; i++)
 			if (strsearch(commands[i], cli_buffer))
@@ -87,26 +85,24 @@ void cli()
 		clear_cmd(cli_buffer);					 // Clear previous command shown on terminal
 		feed(commands[found_index], cli_buffer); // Load found command into current buffer
 		uart_puts(cli_buffer);					 // Show buffer
+		index = strlen(cli_buffer);				 // Update index
 	}
 
 	// Put into a buffer until got new line character
-	else if (c != '\n')
+	else if (input != '\n')
 	{
 		// Check for backspace, if not, continue bufferring
-		if (c != '\b')
+		if (input != '\b')
 		{
-			uart_sendc(c);
-			cli_buffer[index] = c; // Store into the buffer
+			uart_sendc(input);
+			cli_buffer[index] = input; // Store into the buffer
 			index++;
 		}
 
 		// If backspaced, clear in buffer + clear on terminal
-		else if (c == '\b')
+		else if (input == '\b')
 		{
-			if (spec_pressed)
-				index = strlen(cli_buffer); // Get index if buffer is not from manual typing
 			index--;
-
 			if (index >= 0)
 			{
 				cli_buffer[index] = '\0';	 // Clear 1 char in buffer
@@ -121,7 +117,7 @@ void cli()
 	}
 
 	// Return key is pressed
-	else if (c == '\n')
+	else if (input == '\n')
 	{
 		// Check if none command
 		if (cli_buffer[0] == '\0')
@@ -155,7 +151,8 @@ void cli()
 				if (strcmp(temp, commands[0]))
 					cmd_option = 'h'; // Turn on 'help' with parameter flag
 			}
-			else if (temp[8] == ' ') // Check for space which means receive another parameter
+
+			if (temp[8] == ' ') // Check for space which means receive another parameter
 			{
 				temp[8] = '\0'; // Enclose the string
 				if (strcmp(temp, commands[2]))
@@ -189,18 +186,15 @@ void cli()
 
 			else if (strcmp(cli_buffer, commands[5])) // test command
 			{
-				// uart_puts("\nTesting printf command: ");
-				// uart_puts("\n-----------------------------------------------");
-				// test("test_printf");
-
-				// uart_puts("\n");
-
-				// uart_puts("\nTesting mailbox setup: ");
-				// uart_puts("\n-----------------------------------------------");
-				// test("test_mailbox");
+				uart_puts("\nTesting printf command: ");
+				uart_puts("\n-----------------------------------------------");
+				test("test_printf");
 
 				uart_puts("\n");
-				printf("%05d", 6);
+
+				uart_puts("\nTesting mailbox setup: ");
+				uart_puts("\n-----------------------------------------------");
+				test("test_mailbox");
 			}
 
 			// Show error if command not found
@@ -218,7 +212,6 @@ void cli()
 
 			underline_count = 0; // Reset the count for command history
 			plus_count = 0;		 // Reset the count for command history
-			spec_pressed = 0;	 // Reset special key flag
 		}
 	}
 }

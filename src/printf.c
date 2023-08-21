@@ -45,13 +45,14 @@ void printf(char *string, ...)
 			}
 
 			// Print out whether '0' or ' '
-			for (buffer_index = 0; buffer_index < width - 1; buffer_index++)
-			{
-				if (zero_flag)
-					buffer[buffer_index] = '0';
-				else
-					buffer[buffer_index] = ' ';
-			}
+			if (width != 0)
+				for (buffer_index = 0; buffer_index < width - 1; buffer_index++)
+				{
+					if (zero_flag)
+						buffer[buffer_index] = '0';
+					else
+						buffer[buffer_index] = ' ';
+				}
 
 			if (*string == 'd')
 			{

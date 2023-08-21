@@ -60,6 +60,6 @@ extern volatile uint32_t mBuf[36];
 
 /* Function Prototypes */
 int mbox_call(uint32_t buffer_addr, unsigned char channel);
-void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, ...);
+void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t buffer_size, ...);
 
 #endif
