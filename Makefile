@@ -25,8 +25,6 @@ CC = aarch64-none-elf-gcc
 
 # Flags
 GCCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib -nostartfiles
-GCCFLAGS += -Drpi
-GCCFLAGS += -Duart
 
 LDFLAGS = -nostdlib
 
