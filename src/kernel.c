@@ -75,7 +75,7 @@ void cli()
 	else if (input == '\t')
 	{
 		int found_index = 0; // Indexing the found command
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 6; i++)
 			if (strsearch(commands[i], cli_buffer))
 			{
 				found_index = i;
