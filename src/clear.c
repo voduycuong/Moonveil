@@ -11,5 +11,4 @@ void clear_screen_info()
 {
     uart_puts("\n");
     uart_puts("To clear terminal screen.\n");
-    uart_puts("This is not the actual clear screen as usual.\n");
 }

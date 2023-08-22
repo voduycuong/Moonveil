@@ -6,7 +6,7 @@ extern char *colors[];
 // setcolor command
 void set_color(char *buffer, char flag)
 {
-    if (flag == 's')
+    if (flag == 's') // setcolor command flag is on
     {
         int i = 0;
 
