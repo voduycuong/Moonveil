@@ -6,6 +6,8 @@ int color_flag = 0; // Flag for using the default color of prompt
 
 void main()
 {
+	volatile uint32_t __attribute__((aligned(16))) mBuf[36];
+
 	uart_init();		   // Set up serial console
 	clear_screen();		   // Clear screen
 	show_welcome_screen(); // Show welcome screen

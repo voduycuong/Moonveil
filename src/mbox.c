@@ -16,8 +16,6 @@
  *
  */
 
-volatile uint32_t __attribute__((aligned(16))) mBuf[36];
-
 /**
  * Read from the mailbox
  */
@@ -84,28 +82,24 @@ int mbox_call(uint32_t buffer_addr, unsigned char channel)
  * tag_identifier: TAG indentifier value
  * ...: list of parameters for request values (if necessary).
  */
-void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t **res_data, ...)
+void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t **res_data, uint32_t res_length, uint32_t req_length, ...)
 {
-    va_list ap;             // Type to hold information about variable arguments (type)
-    va_start(ap, res_data); // Initialize a variable argument list (macro)
+    va_list ap;               // Type to hold information about variable arguments (type)
+    va_start(ap, req_length); // Initialize a variable argument list (macro)
 
     uint32_t i = 0;
-    uint32_t length = 0;
 
-    mBuf[i++] = 0;              // mBuf[0]: will be filled later at the end.
-    mBuf[i++] = MBOX_REQUEST;   // Message Request Code (this is a request message)
-    mBuf[i++] = tag_identifier; // TAG Identifier
-    mBuf[i++] = 0;              // Value buffer size in bytes
-    mBuf[i++] = 0;              // REQUEST CODE = 0
+    mBuf[i++] = 0;                                                 // mBuf[0]: will be filled later at the end.
+    mBuf[i++] = MBOX_REQUEST;                                      // Message Request Code (this is a request message)
+    mBuf[i++] = tag_identifier;                                    // TAG Identifier
+    mBuf[i++] = res_length > req_length ? res_length : req_length; // Value buffer size in bytes
+    mBuf[i++] = 0;                                                 // REQUEST CODE = 0
 
     while (1)
     {
         int x = va_arg(ap, int); // Get next value
         if (x != 0)
-        {
             mBuf[i++] = x;
-            length++;
-        }
 
         else
             break;
@@ -113,8 +107,7 @@ void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t *
 
     *res_data = (unsigned int *)&mBuf[5];
     mBuf[i++] = MBOX_TAG_LAST;
-    mBuf[0] = i * 4;  // Message Buffer Size in bytes (4 bytes (32 bit) each)
-    mBuf[3] = length; // Length of request/response
+    mBuf[0] = i * 4; // Message Buffer Size in bytes (4 bytes (32 bit) each)
 
     va_end(ap); // End using variable argument list
 }

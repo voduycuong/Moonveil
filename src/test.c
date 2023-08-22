@@ -31,16 +31,16 @@ void test(char *test_case)
     else if (strcmp(test_case, "test_mailbox"))
     {
         uint32_t *physize = 0;
-        // unsigned int *buffer_ptr = (unsigned int *)((unsigned long)buffer_addr);
+        unsigned int *buffer_ptr = (unsigned int *)((unsigned long)buffer_addr);
 
         printf("\n-- Test case 1: Get board revision");
-        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETREVISION, &physize);
+        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETREVISION, &physize, 0, 4);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("\n>>> DATA: Board revision = 0x%x", physize[0]);
         printf("\n");
 
         printf("\n-- Test case 2: Get board MAC address");
-        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETMACADDR, &physize);
+        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETMACADDR, &physize, 0, 6);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         uart_puts("\n>>> DATA: Board MAC address: ");
         uart_macaddr(mBuf[6], 12);
@@ -50,21 +50,21 @@ void test(char *test_case)
         printf("\n");
 
         printf("\n-- Test case 3: Get clock rate");
-        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETCLKRATE, &physize, 3);
+        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETCLKRATE, &physize, 4, 8, 3);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("\n>>> DATA: Clock ID = %d", physize[0]);
         printf("\n>>> DATA: ARM clock rate = %d", physize[1]);
         printf("\n");
 
         printf("\n-- Test case 4: Get physical width/height");
-        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETPHYWH, &physize);
+        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETPHYWH, &physize, 0, 8);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("\n>>> DATA: Width (in px) = %d", physize[0]);
         printf("\n>>> DATA: Height (in px) = %d", physize[1]);
         printf("\n");
 
         printf("\n-- Test case 5: Set physical width/height");
-        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_SETPHYWH, &physize, 1024, 768);
+        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_SETPHYWH, &physize, 8, 8, 1024, 768);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
 
         printf("\n>>> DATA: Actual Physical Width = %d", physize[0]);
@@ -72,7 +72,7 @@ void test(char *test_case)
         printf("\n");
 
         printf("\n-- Test case 6: Get ARM memory");
-        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETARMMEMORY, &physize);
+        mbox_buffer_setup(ADDR(mBuf), MBOX_TAG_GETARMMEMORY, &physize, 0, 8);
         mbox_call(ADDR(mBuf), MBOX_CH_PROP);
         printf("\n>>> DATA: Base address in byte = %d", physize[0]);
         printf("\n>>> DATA: Size in byte = %x", physize[1]);
