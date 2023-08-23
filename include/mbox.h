@@ -8,8 +8,6 @@
 #include "./gcclib/stdarg.h"
 
 /* a properly aligned buffer */
-extern volatile uint32_t mBuf[36];
-
 #define ADDR(X) (uint32_t)((unsigned long)X)
 
 /* Registers */

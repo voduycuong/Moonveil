@@ -6,7 +6,7 @@
 #include "printf.h"
 #include "string.h"
 
-void test(char *test_case);
+void test(int32_t mBuf);
 void test_info();
 
 #endif

@@ -60,6 +60,12 @@ void printf(char *string, ...)
 				int x = va_arg(ap, int); // Retrieve next argument
 				int temp_index = MAX_PRINT_SIZE - 1;
 
+				if (x < 0)
+				{
+					buffer[buffer_index] = '-';
+					buffer_index++;
+					x *= -1;
+				}
 				do
 				{
 					temp_buffer[temp_index] = (x % 10) + '0';
@@ -103,9 +109,18 @@ void printf(char *string, ...)
 			else if (*string == 'x')
 			{
 				string++;
-				int x = va_arg(ap, int);
+				long int x = va_arg(ap, long int);
 				int temp_index = MAX_PRINT_SIZE - 1;
 				static char hex_char[] = "0123456789ABCDEF";
+
+				if (x < 0)
+					x = 4294967295 + x + 1;
+				/*
+				 * The result of negetive will be shown as two's complement
+				 * Step 1: take complement of equivalent positive x -----> 4294967295 - (-x) = 4294967295 + x
+				 * 4294967295 = 2^32 (4 byte) in decimal
+				 * Step 2: adding 1 to the complement number, ignoring any overflow.
+				 */
 
 				do
 				{

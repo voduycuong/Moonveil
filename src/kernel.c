@@ -6,8 +6,6 @@ int color_flag = 0; // Flag for using the default color of prompt
 
 void main()
 {
-	volatile uint32_t __attribute__((aligned(16))) mBuf[36];
-
 	uart_init();		   // Set up serial console
 	clear_screen();		   // Clear screen
 	show_welcome_screen(); // Show welcome screen
@@ -21,6 +19,8 @@ void main()
 
 void cli()
 {
+	volatile uint32_t __attribute__((aligned(16))) mBuf[36];
+
 	static char cli_buffer[MAX_CMD_SIZE];					 // CLI BUFFER
 	static char cmd_history[MAX_HISTORY_SIZE][MAX_CMD_SIZE]; // COMMAND HISTORY
 
@@ -188,15 +188,38 @@ void cli()
 
 			else if (strcmp(cli_buffer, commands[5])) // test command
 			{
-				uart_puts("\nTesting printf command: ");
-				uart_puts("\n-----------------------------------------------");
-				test("test_printf");
+				// uart_puts("\nTesting printf command: ");
+				// uart_puts("\n-----------------------------------------------");
+				// int d = -42069;
+				// printf("\n-- Test case 1: decimal format\n");
+				// printf("%d\n", d);
 
-				uart_puts("\n");
+				// int h = -51966;
+				// printf("\n-- Test case 2: hexa format\n");
+				// printf("0x%x\n", h);
 
-				uart_puts("\nTesting mailbox setup: ");
-				uart_puts("\n-----------------------------------------------");
-				test("test_mailbox");
+				int h = -16;
+				printf("\n-- Test case 2a: hexa format\n");
+				printf("Input: %d ----> Output: 0x%x\n", h, h);
+
+				// char ch = 'G';
+				// printf("\n-- Test case 3: char format\n");
+				// printf("%c\n", ch);
+
+				// char *string = "MOONVEIL";
+				// printf("\n-- Test case 4: string format\n");
+				// printf("%s\n", string);
+
+				// float f = 0.123456;
+				// printf("\n-- Test case 5: float format\n");
+				// printf("%f\n", f);
+
+				// uart_puts("\n-- Test case 6: \%% \n");
+				// printf("%%\n");
+
+				// uart_puts("\nTesting mailbox setup: ");
+				// uart_puts("\n-----------------------------------------------");
+				// test(*mBuf);
 			}
 
 			// Show error if command not found
@@ -232,12 +255,12 @@ void show_prompt(int flag)
 {
 	if (flag == 0)
 	{
-		uart_puts("\x1b[0m");			   // Return to default
-		uart_puts("\x1b[1;34mMoonveil> "); // Bold & Blue foreground text
-		uart_puts("\x1b[0m");			   // Return to default
+		uart_puts("\x1b[0m");				 // Return to default
+		uart_puts("\x1b[1;34mMoonveil\n> "); // Bold & Blue foreground text
+		uart_puts("\x1b[0m");				 // Return to default
 	}
 	else
-		uart_puts("Moonveil> ");
+		uart_puts("Moonveil\n> ");
 }
 
 // Output an error message

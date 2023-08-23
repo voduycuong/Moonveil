@@ -67,21 +67,21 @@ void set_color_info()
 void set_text_color(char *buffer, int i)
 {
     if (strcmp(subst(buffer, i + 2), colors[0])) // black
-        uart_puts("\x1b[30m");
+        uart_puts("\033[30m");
     else if (strcmp(subst(buffer, i + 2), colors[1])) // red
-        uart_puts("\x1b[31m");
+        uart_puts("\033[31m");
     else if (strcmp(subst(buffer, i + 2), colors[2])) // green
-        uart_puts("\x1b[32m");
+        uart_puts("\033[32m");
     else if (strcmp(subst(buffer, i + 2), colors[3])) // yellow
-        uart_puts("\x1b[33m");
+        uart_puts("\033[33m");
     else if (strcmp(subst(buffer, i + 2), colors[4])) // blue
-        uart_puts("\x1b[34m");
+        uart_puts("\033[34m");
     else if (strcmp(subst(buffer, i + 2), colors[5])) // purple
-        uart_puts("\x1b[35m");
+        uart_puts("\033[35m");
     else if (strcmp(subst(buffer, i + 2), colors[6])) // cyan
-        uart_puts("\x1b[36m");
+        uart_puts("\033[36m");
     else if (strcmp(subst(buffer, i + 2), colors[7])) // white
-        uart_puts("\x1b[37m");
+        uart_puts("\033[37m");
     else
     {
         uart_puts("\n'");
@@ -94,21 +94,21 @@ void set_text_color(char *buffer, int i)
 void set_foreground_color(char *buffer, int i)
 {
     if (strcmp(subst(buffer, i + 2), colors[0])) // black
-        uart_puts("\x1b[40m");
+        uart_puts("\033[40m");
     else if (strcmp(subst(buffer, i + 2), colors[1])) // red
-        uart_puts("\x1b[41m");
+        uart_puts("\033[41m");
     else if (strcmp(subst(buffer, i + 2), colors[2])) // green
-        uart_puts("\x1b[42m");
+        uart_puts("\033[42m");
     else if (strcmp(subst(buffer, i + 2), colors[3])) // yellow
-        uart_puts("\x1b[43m");
+        uart_puts("\033[43m");
     else if (strcmp(subst(buffer, i + 2), colors[4])) // blue
-        uart_puts("\x1b[44m");
+        uart_puts("\033[44m");
     else if (strcmp(subst(buffer, i + 2), colors[5])) // purple
-        uart_puts("\x1b[45m");
+        uart_puts("\033[45m");
     else if (strcmp(subst(buffer, i + 2), colors[6])) // cyan
-        uart_puts("\x1b[46m");
+        uart_puts("\033[46m");
     else if (strcmp(subst(buffer, i + 2), colors[7])) // white
-        uart_puts("\x1b[47m");
+        uart_puts("\033[47m");
     else
     {
         uart_puts("\n'");
