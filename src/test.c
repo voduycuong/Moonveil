@@ -5,42 +5,44 @@ void test(int test_case)
 
     if (test_case == '1')
     {
-        int d2 = 16995;
-        printf("\n***** decimal format\n");
-        printf("Value: %d ----> Output: %d\n", d2, d2);
+        // int d2 = 16995;
+        // uart_puts("\n***** \%d format\n");
+        // printf("Value: %d ----> Output: %d\n", d2, d2);
 
-        int d1 = -42069;
-        printf("\n***** negetive decimal format\n");
-        printf("Value: %d ----> Output: %d\n", d1, d1);
+        // int d1 = -42069;
+        // printf("\n***** negetive decimal format\n");
+        // printf("Value: %d ----> Output: %d\n", d1, d1);
 
         // int d3 = 821211;
         // printf("\n***** width = 5\n");
         // printf("Value: %d ----> Output: %50d\n", d3, d3);
 
-        int d4 = 270298;
-        printf("\n***** 0 flag (10)\n");
-        printf("Value: %d ----> Output: %02d\n", d4, d4);
+        int d4 = 11111;
+        uart_puts("\n***** 0 flag (\%03d)\n");
+        printf("%03d\n", d4, d4);
 
-        int h1 = 51966;
-        int h2 = -16;
-        printf("\n***** hexa format\n");
-        printf("Value: %d ----> Output: 0x%x\n", h1, h1);
-        printf("Value: %d ----> Output: 0x%x\n", h2, h2);
+        // Value: % d-- -- > Output:
 
-        char ch = 'G';
-        printf("\n***** char format\n");
-        printf("%c\n", ch);
+        // int h1 = 51966;
+        // int h2 = -16;
+        // printf("\n***** hexa format\n");
+        // printf("Value: %d ----> Output: 0x%x\n", h1, h1);
+        // printf("Value: %d ----> Output: 0x%x\n", h2, h2);
 
-        char *string = "MOONVEIL";
-        printf("\n***** string format\n");
-        printf("%s\n", string);
+        // char ch = 'G';
+        // printf("\n***** char format\n");
+        // printf("%c\n", ch);
 
-        float f = 0.123456;
-        printf("\n***** float format\n");
-        printf("%f\n", f);
+        // char *string = "MOONVEIL";
+        // printf("\n***** string format\n");
+        // printf("%s\n", string);
 
-        uart_puts("\n***** \%\% format\n");
-        printf("%%\n");
+        // float f = 0.123456;
+        // printf("\n***** float format\n");
+        // printf("%f\n", f);
+
+        // uart_puts("\n***** \%\% format\n");
+        // printf("%%\n");
     }
 
     else // This is for mailbox test case, which is test_case == mBuf

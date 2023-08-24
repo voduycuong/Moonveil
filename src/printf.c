@@ -13,10 +13,12 @@ void printf(char *string, ...)
 
 	char buffer[MAX_PRINT_SIZE];
 	int buffer_index = 0;
-	int zero_flag = 0;
-	int zero_num = 0;
 
 	char temp_buffer[MAX_PRINT_SIZE];
+
+	uint16_t width = 0;
+	uint16_t zero_flag = 0;
+	uint16_t zero_num = 0;
 
 	while (1)
 	{
@@ -30,27 +32,18 @@ void printf(char *string, ...)
 		{
 			string++;
 
-			// Check if 0 flag is on and check for the next character
 			if (*string == '0')
 			{
 				zero_flag = 1;
 				string++;
 			}
 
-			if (*string >= '1' && *string <= '9')
+			// Check if 0 flag is on and check for the next character
+			while (*string >= '0' && *string <= '9')
 			{
-				zero_num = zero_num * 10 + (*string - '0');
+				width = width * 10 + (*string - '0');
 				string++;
 			}
-
-			// if (zero_num == 0)
-			// 	zero_flag = 0;
-
-			// uart_puts("\n");
-			// uart_dec(zero_num);
-			// uart_puts("\n");
-			// uart_dec(zero_flag);
-			// uart_puts("\n");
 
 			if (*string == 'd')
 			{
@@ -71,13 +64,15 @@ void printf(char *string, ...)
 					x /= 10;
 				} while (x != 0);
 
+				// if (width > 0 && width < (MAX_PRINT_SIZE - temp_index))
+				for (buffer_index = 0; buffer_index <= (width - (MAX_PRINT_SIZE - temp_index)); buffer_index++)
+					if (zero_flag)
+						buffer[buffer_index] = '0';
+					else
+						buffer[buffer_index] = ' ';
+
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
 				{
-					if (zero_flag && zero_num < (MAX_PRINT_SIZE - temp_index))
-					{
-						for (buffer_index = 0; MAX_PRINT_SIZE - temp_index - zero_num; buffer_index++)
-							buffer[buffer_index] = '0';
-					}
 					buffer[buffer_index] = temp_buffer[i];
 					buffer_index++;
 				}
