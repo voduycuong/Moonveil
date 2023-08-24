@@ -18,7 +18,13 @@
         "cstdint": "c",
         "*.tcc": "c",
         "random": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c"
     },
     "cmake.configureOnOpen": false
 }

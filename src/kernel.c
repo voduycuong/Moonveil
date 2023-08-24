@@ -33,7 +33,7 @@ void cli()
 
 	static char cmd_option = 'x'; // Command option flag
 
-	char input = uart_getc(); // Read and send back each char
+	char input = uart_getc(); // Get input from keyboard
 
 	// '_' key is pressed
 	if (input == '_')
@@ -188,38 +188,18 @@ void cli()
 
 			else if (strcmp(cli_buffer, commands[5])) // test command
 			{
-				// uart_puts("\nTesting printf command: ");
-				// uart_puts("\n-----------------------------------------------");
-				// int d = -42069;
-				// printf("\n-- Test case 1: decimal format\n");
-				// printf("%d\n", d);
+				uart_puts("\nChoose test case: ");
+				char value = uart_getc(); // Read each char
+				uart_sendc(value);
 
-				// int h = -51966;
-				// printf("\n-- Test case 2: hexa format\n");
-				// printf("0x%x\n", h);
-
-				int h = -16;
-				printf("\n-- Test case 2a: hexa format\n");
-				printf("Input: %d ----> Output: 0x%x\n", h, h);
-
-				// char ch = 'G';
-				// printf("\n-- Test case 3: char format\n");
-				// printf("%c\n", ch);
-
-				// char *string = "MOONVEIL";
-				// printf("\n-- Test case 4: string format\n");
-				// printf("%s\n", string);
-
-				// float f = 0.123456;
-				// printf("\n-- Test case 5: float format\n");
-				// printf("%f\n", f);
-
-				// uart_puts("\n-- Test case 6: \%% \n");
-				// printf("%%\n");
-
-				// uart_puts("\nTesting mailbox setup: ");
-				// uart_puts("\n-----------------------------------------------");
-				// test(*mBuf);
+				// Test case for printf function
+				if (value == '1')
+					test(value);
+				// Test case for mailbox setup function
+				else if (value == '2')
+					test((unsigned long)mBuf);
+				else
+					uart_puts("\nInvalid test case. Please try again.\n");
 			}
 
 			// Show error if command not found

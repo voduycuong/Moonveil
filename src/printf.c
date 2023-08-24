@@ -13,8 +13,8 @@ void printf(char *string, ...)
 
 	char buffer[MAX_PRINT_SIZE];
 	int buffer_index = 0;
-	int width = 0;
 	int zero_flag = 0;
+	int zero_num = 0;
 
 	char temp_buffer[MAX_PRINT_SIZE];
 
@@ -37,22 +37,20 @@ void printf(char *string, ...)
 				string++;
 			}
 
-			// Counting width
-			while (*string >= '1' && *string <= '9')
+			if (*string >= '1' && *string <= '9')
 			{
-				width = width * 10 + (*string - '0');
+				zero_num = zero_num * 10 + (*string - '0');
 				string++;
 			}
 
-			// Print out whether '0' or ' '
-			if (width != 0)
-				for (buffer_index = 0; buffer_index < width - 1; buffer_index++)
-				{
-					if (zero_flag)
-						buffer[buffer_index] = '0';
-					else
-						buffer[buffer_index] = ' ';
-				}
+			// if (zero_num == 0)
+			// 	zero_flag = 0;
+
+			// uart_puts("\n");
+			// uart_dec(zero_num);
+			// uart_puts("\n");
+			// uart_dec(zero_flag);
+			// uart_puts("\n");
 
 			if (*string == 'd')
 			{
@@ -75,6 +73,11 @@ void printf(char *string, ...)
 
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
 				{
+					if (zero_flag && zero_num < (MAX_PRINT_SIZE - temp_index))
+					{
+						for (buffer_index = 0; MAX_PRINT_SIZE - temp_index - zero_num; buffer_index++)
+							buffer[buffer_index] = '0';
+					}
 					buffer[buffer_index] = temp_buffer[i];
 					buffer_index++;
 				}
