@@ -108,8 +108,7 @@ void cli()
 			if (index >= 0)
 			{
 				cli_buffer[index] = '\0';	 // Clear 1 char in buffer
-				uart_puts("\033[1D\033[0K"); // Clear 1 char in terminal
-											 // (Move cursor left 1 step & Clear line from cursor left)
+				uart_puts("\033[1D\033[0K"); // Clear 1 char in terminal (Move cursor left 1 step & Clear line from cursor left)
 			}
 
 			// Restart index if buffer is empty

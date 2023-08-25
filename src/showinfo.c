@@ -19,6 +19,8 @@ void show_info()
     old_mBuf[9] = 0;          // clear output buffer (response data are old_mBuf[9])
     old_mBuf[10] = 0;         // clear output buffer (response data are old_mBuf[10])
 
+    old_mBuf[11] = MBOX_TAG_LAST;
+
     if (mbox_call(ADDR(old_mBuf), MBOX_CH_PROP))
     {
         uart_puts("Response Code for whole message: ");
@@ -37,7 +39,7 @@ void show_info()
 
         uart_puts("Board MAC address: \n\t");
         uart_macaddr(old_mBuf[10], 12);
-        uart_sendc(':');
+        uart_sendc('-');
         uart_macaddr(old_mBuf[9], 28);
         uart_puts("\n");
     }
@@ -47,7 +49,7 @@ void show_info()
     }
 }
 
-// showinfo command info
+// showinfo command infomation
 void show_info_info()
 {
     uart_puts("\n");

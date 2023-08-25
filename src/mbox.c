@@ -97,11 +97,11 @@ void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t *
 
     uint32_t i = 0;
 
-    buffer[i++] = 0;                                                 // mBuf[0]: will be filled later at the end.
-    buffer[i++] = MBOX_REQUEST;                                      // Message Request Code (this is a request message)
-    buffer[i++] = tag_identifier;                                    // TAG Identifier
-    buffer[i++] = req_length > res_length ? req_length : res_length; // Value buffer size in bytes
-    buffer[i++] = 0;                                                 // REQUEST CODE = 0
+    buffer[i++] = 0;                                                  // mBuf[0]: will be filled later at the end.
+    buffer[i++] = MBOX_REQUEST;                                       // Message Request Code (this is a request message)
+    buffer[i++] = tag_identifier;                                     // TAG Identifier
+    buffer[i++] = req_length >= res_length ? req_length : res_length; // Value buffer size in bytes
+    buffer[i++] = 0;                                                  // REQUEST CODE = 0
 
     while (1)
     {

@@ -20,7 +20,7 @@ void show_about()
     uart_puts("\t\t\t\t\t\tDeveloped by Vo Duy Cuong - S3941544\n");
 }
 
-// about command info
+// about command infomation
 void show_about_info()
 {
     uart_puts("\n");

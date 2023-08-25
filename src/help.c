@@ -44,7 +44,7 @@ void show_help(char *buffer, char flag)
     }
 }
 
-// help command info
+// help command infomation
 void show_help_info()
 {
     uart_puts("\n");

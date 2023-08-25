@@ -47,7 +47,7 @@ void set_color(char *buffer, char flag)
         uart_puts("\n'setcolor' must go with parameter(s). See 'help setcolor'.\n");
 }
 
-// setcolor command info
+// setcolor command infomation
 void set_color_info()
 {
     uart_puts("\n");

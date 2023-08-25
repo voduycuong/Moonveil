@@ -152,7 +152,7 @@ void uart_macaddr(unsigned int num, unsigned int pos)
 		put_colon++;
 		if (put_colon == 2 && i != 0)
 		{
-			uart_sendc(':');
+			uart_sendc('-');
 			put_colon = 0;
 		}
 	}
