@@ -9,40 +9,36 @@ void test(int test_case)
 
         char delay = uart_getc(); // Pseudo-delay for demo
 
-        int d2 = 16995;
         uart_puts("\n***** \%d format\n");
+        int d1 = 16995;
+        int d2 = -42069;
+        printf("Value: %d ----> Output: %d\n", d1, d1);
         printf("Value: %d ----> Output: %d\n", d2, d2);
 
         delay = uart_getc(); // Press any key to proceed
 
-        int d1 = -42069;
-        printf("\n***** negetive decimal format\n");
-        printf("Value: %d ----> Output: %d\n", d1, d1);
-
-        delay = uart_getc(); // Press any key to proceed
-
+        uart_puts("\n***** \%x format\n");
         int h1 = 51966;
         int h2 = -16;
-        uart_puts("\n***** \%x format\n");
         printf("Value: %d ----> Output: %x\n", h1, h1);
         printf("Value: %d ----> Output: %x\n", h2, h2);
 
         delay = uart_getc(); // Press any key to proceed
 
-        char ch = 'G';
         uart_puts("\n***** \%c format\n");
+        char ch = 'G';
         printf("%c\n", ch);
 
         delay = uart_getc(); // Press any key to proceed
 
-        char *string = "MOONVEIL";
         uart_puts("\n***** \%s format\n");
+        char *string = "MOONVEIL";
         printf("%s\n", string);
 
         delay = uart_getc(); // Press any key to proceed
 
-        float f = 9.1200;
         uart_puts("\n***** \%f format\n");
+        float f = 9.1200;
         printf("%f\n", f);
 
         delay = uart_getc(); // Press any key to proceed
@@ -52,14 +48,14 @@ void test(int test_case)
 
         delay = uart_getc(); // Press any key to proceed
 
-        int d3 = 821211;
         uart_puts("\n***** width = 10 (\%10d)\n");
+        int d3 = 821211;
         printf("Value: %d ----> Output: %10d\n", d3, d3);
 
         delay = uart_getc(); // Press any key to proceed
 
-        int d4 = 11111;
         uart_puts("\n***** 0 flag (\%010d)\n");
+        int d4 = 11111;
         printf("Value: %d ----> Output: %010d\n", d4, d4);
 
         uart_sendc(delay - delay); // To avoid warning 'variable not used'
@@ -85,7 +81,7 @@ void test(int test_case)
         mbox_call(ADDR(test_case), MBOX_CH_PROP);
         uart_puts("\n\t>>> DATA: Board MAC address: ");
         uart_macaddr(data[1], 12);
-        uart_sendc(':');
+        uart_sendc('-');
         uart_macaddr(data[0], 28);
         printf("\n");
 

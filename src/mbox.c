@@ -94,7 +94,6 @@ void mbox_buffer_setup(uint32_t buffer_addr, uint32_t tag_identifier, uint32_t *
     va_start(ap, res_length); // Initialize a variable argument list (macro)
 
     uint32_t *buffer = (uint32_t *)((uint64_t)buffer_addr);
-
     uint32_t i = 0;
 
     buffer[i++] = 0;                                                  // mBuf[0]: will be filled later at the end.

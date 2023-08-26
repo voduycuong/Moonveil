@@ -196,7 +196,7 @@ void cli()
 					test(value);
 				// Test case for mailbox setup function
 				else if (value == '2')
-					test((unsigned long)mBuf);
+					test((uint64_t)mBuf);
 				else
 					uart_puts("\nInvalid test case. Please try again.\n");
 			}
