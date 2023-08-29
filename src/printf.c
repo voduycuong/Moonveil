@@ -84,21 +84,7 @@ void printf(char *string, ...)
 					x /= 10;
 				} while (x != 0);
 
-				// Check for 0 flag or width
-				do
-				{
-					if (zero_flag)
-						temp_buffer[temp_index--] = '0';
-					else if (width_flag)
-						temp_buffer[temp_index--] = ' ';
-				} while (MAX_PRINT_SIZE - temp_index <= width);
-
-				// Check for precision
-				do
-				{
-					if (precision_flag)
-						temp_buffer[temp_index--] = '0';
-				} while (MAX_PRINT_SIZE - temp_index <= precision);
+				special_condition(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
 
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
 					buffer[buffer_index++] = temp_buffer[i];
@@ -154,6 +140,8 @@ void printf(char *string, ...)
 					integer_part /= 10;									 // Remove the last digit
 				}
 
+				special_condition(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
+
 				// Feed temp_buffer to buffer from left to right
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
 				{
@@ -189,18 +177,7 @@ void printf(char *string, ...)
 					x /= 16;
 				} while (x != 0);
 
-				// Check for 0 flag or width
-				do
-				{
-					if (zero_flag)
-						temp_buffer[temp_index--] = '0';
-					else if (width_flag)
-						temp_buffer[temp_index--] = ' ';
-				} while (MAX_PRINT_SIZE - temp_index <= width);
-
-				// Print out hex format indicator
-				buffer[buffer_index++] = '0';
-				buffer[buffer_index++] = 'x';
+				special_condition(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
 
 				// Feed temp_ buffer to buffer
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
@@ -229,4 +206,28 @@ void printf(char *string, ...)
 
 	// Print out the buffer
 	uart_puts(buffer);
+}
+
+// Function for setup 0-flag, width and precision
+void special_condition(int zero_flag, int width_flag, int width, int precision_flag, int precision, char *buffer, int *index)
+{
+	int temp = *index;
+
+	// Check for 0 flag or width
+	while (MAX_PRINT_SIZE - temp <= width)
+	{
+		if (zero_flag)
+			buffer[temp--] = '0';
+		else if (width_flag)
+			buffer[temp--] = ' ';
+	}
+
+	// Check for precision
+	while (MAX_PRINT_SIZE - temp <= precision)
+	{
+		if (precision_flag)
+			buffer[temp--] = '0';
+	}
+
+	*index = temp;
 }
