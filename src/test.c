@@ -5,60 +5,64 @@ void test(int test_case)
 
     if (test_case == '1')
     {
-        uart_puts("\n***** Test case 1: printf() function\n");
+        // uart_puts("\n***** Test case 1: printf() function\n");
 
-        char delay = uart_getc(); // Pseudo-delay for demo
+        // char delay = uart_getc(); // Pseudo-delay for demo
 
-        uart_puts("\n***** \%d format\n");
-        int d1 = 16995;
-        int d2 = -42069;
-        printf("Value: %d ----> Output: %d\n", d1, d1);
-        printf("Value: %d ----> Output: %d\n", d2, d2);
+        // uart_puts("\n***** \%d format\n");
+        // int d1 = 16995;
+        // int d2 = 42069;
+        // int d3 = -42069;
+        // printf("Value: %d ----> Output: %d\n", d1, d1);
+        // printf("Value: %d ----> Output: %.10d\n", d2, d2);
+        // printf("Value: %d ----> Output: %d\n", d3, d3);
 
-        delay = uart_getc(); // Press any key to proceed
+        // delay = uart_getc(); // Press any key to proceed
 
-        uart_puts("\n***** \%x format\n");
-        int h1 = 51966;
-        int h2 = -16;
-        printf("Value: %d ----> Output: %x\n", h1, h1);
-        printf("Value: %d ----> Output: %x\n", h2, h2);
+        // uart_puts("\n***** \%x format\n");
+        // int h1 = 51966;
+        // int h2 = -16;
+        // printf("Value: %d ----> Output: %x\n", h1, h1);
+        // printf("Value: %d ----> Output: %x\n", h2, h2);
 
-        delay = uart_getc(); // Press any key to proceed
+        // delay = uart_getc(); // Press any key to proceed
 
-        uart_puts("\n***** \%c format\n");
-        char ch = 'G';
-        printf("%c\n", ch);
+        // uart_puts("\n***** \%c format\n");
+        // char ch = 'G';
+        // printf("%c\n", ch);
 
-        delay = uart_getc(); // Press any key to proceed
+        // delay = uart_getc(); // Press any key to proceed
 
-        uart_puts("\n***** \%s format\n");
-        char *string = "MOONVEIL";
-        printf("%s\n", string);
+        // uart_puts("\n***** \%s format\n");
+        // char *string = "MOONVEIL";
+        // printf("%s\n", string);
 
-        delay = uart_getc(); // Press any key to proceed
+        // delay = uart_getc(); // Press any key to proceed
 
         uart_puts("\n***** \%f format\n");
-        float f = 9.1200;
-        printf("%f\n", f);
+        double f1 = 10.1244444;
+        double f2 = -10.1244444;
+        double f3 = -10.1244444;
+        printf("%f\n%f\n%.3f\n", f1, f2, f3);
 
-        delay = uart_getc(); // Press any key to proceed
+        // delay = uart_getc(); // Press any key to proceed
 
-        uart_puts("\n***** \%\% format\n");
-        printf("%%\n");
+        // uart_puts("\n***** \%\% format\n");
+        // printf("%%\n");
 
-        delay = uart_getc(); // Press any key to proceed
+        // delay = uart_getc(); // Press any key to proceed
 
-        uart_puts("\n***** width = 10 (\%10d)\n");
-        int d3 = 821211;
-        printf("Value: %d ----> Output: %10d\n", d3, d3);
+        // uart_puts("\n***** width = 10 (\%10d)\n");
+        // int d3 = 821211;
+        // printf("Value: %d ----> Output: %10d\n", d3, d3);
 
-        delay = uart_getc(); // Press any key to proceed
+        // delay = uart_getc(); // Press any key to proceed
 
-        uart_puts("\n***** 0 flag (\%010d)\n");
-        int d4 = 11111;
-        printf("Value: %d ----> Output: %010d\n", d4, d4);
+        // uart_puts("\n***** 0 flag (\%010d)\n");
+        // int d4 = 11111;
+        // printf("Value: %d ----> Output: %010d\n", d4, d4);
 
-        uart_sendc(delay - delay); // To avoid warning 'variable not used'
+        // uart_sendc(delay - delay); // To avoid warning 'variable not used'
     }
 
     else // This is for mailbox test case, which is test_case == mBuf

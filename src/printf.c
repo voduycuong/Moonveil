@@ -17,8 +17,10 @@ void printf(char *string, ...)
 	char temp_buffer[MAX_PRINT_SIZE];
 
 	int16_t width = 0;
+	int16_t precision = 0;
 	int16_t zero_flag = 0;
 	int16_t width_flag = 0;
+	int16_t precision_flag = 0;
 
 	while (1)
 	{
@@ -32,21 +34,36 @@ void printf(char *string, ...)
 		{
 			string++;
 
-			// Check if 0 flag is on and check for the next character
+			// Check for 0 flag
 			if (*string == '0')
 			{
 				zero_flag = 1;
 				string++;
 			}
 
-			// Calculate both 0 flag and width
+			// Calculate 0 and width
 			while (*string >= '0' && *string <= '9')
 			{
 				width = width * 10 + (*string - '0');
 				string++;
 			}
+
 			if (width > 0)
 				width_flag = 1;
+
+			// Check for precision flag
+			if (*string == '.')
+			{
+				precision_flag = 1;
+				string++;
+			}
+
+			// Calculate precision
+			while (*string >= '0' && *string <= '9')
+			{
+				precision = precision * 10 + (*string - '0');
+				string++;
+			}
 
 			if (*string == 'd')
 			{
@@ -60,6 +77,7 @@ void printf(char *string, ...)
 					buffer[buffer_index++] = '-'; // Put negative sign
 					x *= -1;					  // Invert number
 				}
+
 				do
 				{
 					temp_buffer[temp_index--] = (x % 10) + '0';
@@ -74,6 +92,13 @@ void printf(char *string, ...)
 					else if (width_flag)
 						temp_buffer[temp_index--] = ' ';
 				} while (MAX_PRINT_SIZE - temp_index <= width);
+
+				// Check for precision
+				do
+				{
+					if (precision_flag)
+						temp_buffer[temp_index--] = '0';
+				} while (MAX_PRINT_SIZE - temp_index <= precision);
 
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
 					buffer[buffer_index++] = temp_buffer[i];
@@ -100,21 +125,33 @@ void printf(char *string, ...)
 				double x = va_arg(ap, double); // Retrieve next argument
 				int temp_index = MAX_PRINT_SIZE - 1;
 
-				double n = (x - (int)x); // Get the fractional part
-				while (n > 0)			 // Loop until x is zero
+				if (!precision_flag)
+					precision = 6;
+
+				// Check for negative number
+				if (x < 0)
 				{
-					n *= 10;								  // Multiply x by 10
-					temp_buffer[temp_index--] = '0' + (int)n; // Store the first digit
-					n -= (int)n;							  // Remove the first digit
+					buffer[buffer_index++] = '-'; // Put negative sign
+					x *= -1;					  // Invert number
+				}
+
+				int integer_part = x;					  // Get the integer part
+				double decimal_part = (x - integer_part); // Get the decimal part
+
+				// while (decimal_part > 0) // Loop until x is zero
+				for (int i = 0; i < precision; i++)
+				{
+					decimal_part *= 10.0;							// Multiply x by 10
+					temp_buffer[temp_index--] = '0' + decimal_part; // Store the first digit
+					decimal_part -= (int)decimal_part;				// Remove the first digit
 				}
 
 				temp_buffer[temp_index--] = '.'; // Add decimal point
 
-				int m = (int)x; // Get the integer part
-				while (m > 0)	// Loop until m is zero
+				while (integer_part > 0) // Loop until integer_part is zero
 				{
-					temp_buffer[temp_index--] = '0' + m % 10; // Store the last digit
-					m /= 10;								  // Remove the last digit
+					temp_buffer[temp_index--] = '0' + integer_part % 10; // Store the last digit
+					integer_part /= 10;									 // Remove the last digit
 				}
 
 				// Feed temp_buffer to buffer from left to right
@@ -182,6 +219,10 @@ void printf(char *string, ...)
 
 		if (buffer_index == MAX_PRINT_SIZE - 1)
 			break;
+
+		// Reset width and precision counting
+		width = 0;
+		precision = 0;
 	}
 
 	va_end(ap); // End using variable argument list

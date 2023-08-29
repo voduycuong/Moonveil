@@ -187,18 +187,20 @@ void cli()
 
 			else if (strcmp(cli_buffer, commands[5])) // test command
 			{
-				uart_puts("\nChoose test case: ");
-				char value = uart_getc(); // Read each char
-				uart_sendc(value);
+				// uart_puts("\nChoose test case: ");
+				// char value = uart_getc(); // Read each char
+				// uart_sendc(value);
 
-				// Test case for printf function
-				if (value == '1')
-					test(value);
-				// Test case for mailbox setup function
-				else if (value == '2')
-					test((uint64_t)mBuf);
-				else
-					uart_puts("\nInvalid test case. Please try again.\n");
+				// // Test case for printf function
+				// if (value == '1')
+				// 	test(value);
+				// // Test case for mailbox setup function
+				// else if (value == '2')
+				// 	test((uint64_t)mBuf);
+				// else
+				// 	uart_puts("\nInvalid test case. Please try again.\n");
+
+				test('1');
 			}
 
 			// Show error if command not found
