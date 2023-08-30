@@ -34,28 +34,36 @@ void printf(char *string, ...)
 		{
 			string++;
 
-			// Check for 0 flag
-			if (*string == '0')
+			if (*string == '*') // Width is not specified in the format string
+			{
+				width = va_arg(ap, int); // Retrieve next argument (preceding the argument that has to be formatted)
+				string++;
+			}
+
+			if (*string == '0') // Check for 0 flag
 			{
 				zero_flag = 1;
 				string++;
 			}
 
-			// Calculate 0 and width
+			// Calculate width
 			while (*string >= '0' && *string <= '9')
 			{
 				width = width * 10 + (*string - '0');
 				string++;
 			}
-
 			if (width > 0)
 				width_flag = 1;
 
-			// Check for precision flag
-			if (*string == '.')
+			if (*string == '.') // Check for precision flag
 			{
 				precision_flag = 1;
 				string++;
+				if (*string == '*') // Precision is not specified in the format string
+				{
+					precision = va_arg(ap, int); // Retrieve next argument (preceding the argument that has to be formatted)
+					string++;
+				}
 			}
 
 			// Calculate precision
@@ -65,6 +73,7 @@ void printf(char *string, ...)
 				string++;
 			}
 
+			// %d format specifier
 			if (*string == 'd')
 			{
 				string++;
@@ -78,33 +87,61 @@ void printf(char *string, ...)
 					x *= -1;					  // Invert number
 				}
 
+				// Convert in to char
 				do
 				{
 					temp_buffer[temp_index--] = (x % 10) + '0';
 					x /= 10;
 				} while (x != 0);
 
-				special_condition(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
+				// Check for format specifier
+				format_specifier(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
 
+				// Load into buffer
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
 					buffer[buffer_index++] = temp_buffer[i];
 			}
 
+			// %c format specifier
 			else if (*string == 'c')
 			{
 				string++;
 				int x = va_arg(ap, int); // Retrieve next argument
-				buffer[buffer_index++] = x;
+				int temp_index = MAX_PRINT_SIZE - 1;
+
+				temp_buffer[temp_index--] = x;
+
+				// Check for format specifier
+				format_specifier(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
+
+				// Load into buffer
+				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
+					buffer[buffer_index++] = temp_buffer[i];
 			}
 
+			// %s format specifier
 			else if (*string == 's')
 			{
 				string++;
 				char *x = va_arg(ap, char *); // Retrieve next argument
-				for (int i = 0; i < strlen(x); i++)
-					buffer[buffer_index++] = x[i];
+				int temp_index = MAX_PRINT_SIZE - 1;
+
+				for (int i = strlen(x) - 1; i >= 0; i--)
+					temp_buffer[temp_index--] = x[i];
+
+				// Check for format specifier
+				format_specifier(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
+
+				// Load into buffer
+				if (precision_flag == 1 && precision < strlen(x))
+					for (int i = temp_index + 1; i < temp_index + 1 + precision; i++)
+						buffer[buffer_index++] = temp_buffer[i];
+				else
+					for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
+						buffer[buffer_index++] = temp_buffer[i];
 			}
 
+			// %f format specifier
 			else if (*string == 'f')
 			{
 				string++;
@@ -140,7 +177,8 @@ void printf(char *string, ...)
 					integer_part /= 10;									 // Remove the last digit
 				}
 
-				special_condition(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
+				// Check for format specifier
+				format_specifier(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
 
 				// Feed temp_buffer to buffer from left to right
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
@@ -159,6 +197,7 @@ void printf(char *string, ...)
 				}
 			}
 
+			// %x format specifier
 			else if (*string == 'x')
 			{
 				string++;
@@ -170,16 +209,17 @@ void printf(char *string, ...)
 				if (x < 0)
 					x = 4294967295 + x + 1; // Convert to two's complement
 
-				// Convert to hex
+				// Convert to hex char
 				do
 				{
 					temp_buffer[temp_index--] = hex_char[x % 16];
 					x /= 16;
 				} while (x != 0);
 
-				special_condition(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
+				// Check for format specifier
+				format_specifier(zero_flag, width_flag, width, precision_flag, precision, temp_buffer, &temp_index);
 
-				// Feed temp_ buffer to buffer
+				// Load into buffer
 				for (int i = temp_index + 1; i < MAX_PRINT_SIZE; i++)
 					buffer[buffer_index++] = temp_buffer[i];
 			}
@@ -188,12 +228,14 @@ void printf(char *string, ...)
 				uart_sendc('%');
 		}
 
+		// No format specifier
 		else
 		{
 			buffer[buffer_index++] = *string;
 			string++;
 		}
 
+		// Reach end of the format string
 		if (buffer_index == MAX_PRINT_SIZE - 1)
 			break;
 
@@ -209,7 +251,7 @@ void printf(char *string, ...)
 }
 
 // Function for setup 0-flag, width and precision
-void special_condition(int zero_flag, int width_flag, int width, int precision_flag, int precision, char *buffer, int *index)
+void format_specifier(int zero_flag, int width_flag, int width, int precision_flag, int precision, char *buffer, int *index)
 {
 	int temp = *index;
 
@@ -224,10 +266,7 @@ void special_condition(int zero_flag, int width_flag, int width, int precision_f
 
 	// Check for precision
 	while (MAX_PRINT_SIZE - temp <= precision)
-	{
-		if (precision_flag)
-			buffer[temp--] = '0';
-	}
+		buffer[temp--] = '0';
 
 	*index = temp;
 }

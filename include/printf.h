@@ -8,6 +8,6 @@
 #include "string.h"
 
 void printf(char *string, ...);
-void special_condition(int zero_flag, int width_flag, int width, int precision_flag, int precision, char *buffer, int *index);
+void format_specifier(int zero_flag, int width_flag, int width, int precision_flag, int precision, char *buffer, int *index);
 
 #endif
